@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning Platform - Inicio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <video autoplay muted loop class="video-bg">
+        <source src="https://videos.pexels.com/video-files/33617447/14288617_1920_1080_30fps.mp4" type="video/mp4">
+    </video>
+    
+    <div class="container">
+        <div class="header">
+            <div id="typeWriter" class="header-icon"></div>
+            <img src="images/logo t.png" alt="Logo" class="logo-top">
+            <h1>English Learning Platform</h1>
+        </div>
+
+        <p class="intro-text">
+            Bienvenido a nuestra plataforma de aprendizaje de inglés. 
+            Aquí podrás mejorar tus habilidades en el idioma inglés a través de 
+            lecciones interactivas, ejercicios prácticos y actividades diseñadas 
+            especialmente para ti. ¡Comienza tu viaje hacia la fluidez en inglés hoy mismo!
+        </p>
+
+        <div class="logo-loop" id="logoLoop">
+            <div class="logo-loop__track">
+                <div class="logo-loop__slide">
+                    <img src="images/logo t.png" alt="Logo" class="logo-loop__logo">
+                </div>
+                <div class="logo-loop__slide">
+                    <img src="images/lauruse.png" alt="Lauruse" class="logo-loop__logo">
+                </div>
+                <div class="logo-loop__slide">
+                    <img src="images/google.png" alt="Google" class="logo-loop__logo">
+                </div>
+                <div class="logo-loop__slide">
+                    <img src="images/unreal.png" alt="Unreal" class="logo-loop__logo">
+                </div>
+                <div class="logo-loop__slide">
+                    <img src="images/superbase.png" alt="Superbase" class="logo-loop__logo">
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="animated-button" onclick="window.location.href='pages/login.html'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
+                    <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                </svg>
+                <span class="text">Iniciar Sesión</span>
+                <span class="circle"></span>
+            </button>
+            <button class="animated-button" onclick="window.location.href='pages/register.html'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
+                    <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                </svg>
+                <span class="text">Registrarse</span>
+                <span class="circle"></span>
+            </button>
+        </div>
+
+        <div class="features" style="display: none;">
+            <div class="feature">
+                <div class="feature-icon"></div>
+                <div class="feature-text">Lecciones Completas</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"></div>
+                <div class="feature-text">Ejercicios Prácticos</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"></div>
+                <div class="feature-text">Objetivos Personalizados</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"></div>
+                <div class="feature-text">Seguimiento de Progreso</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/typewriter.js"></script>
+    <script src="js/logoloop.js"></script>
+</body>
+</html>

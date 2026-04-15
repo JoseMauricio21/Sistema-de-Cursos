@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - English Learning</title>
+    <link rel="stylesheet" href="../css/perfil.css">
+</head>
+<body>
+    <!-- Video Background -->
+    <video class="bg-video" autoplay muted loop playsinline>
+        <source src="https://videos.pexels.com/video-files/35194305/14909830_3840_2160_24fps.mp4" type="video/mp4">
+    </video>
+    <div class="bg-overlay"></div>
+
+    <!-- Main Container -->
+    <div class="profile-container">
+        <!-- Header -->
+        <div class="profile-header">
+            <button class="back-btn" id="backBtn">← Volver</button>
+            <h1>Mi Perfil</h1>
+        </div>
+
+        <!-- Content Area -->
+        <div class="profile-content">
+            <!-- Profile Picture Section -->
+            <div class="profile-picture-section">
+                <div class="profile-picture-container">
+                    <img id="profileImage" src="https://via.placeholder.com/140?text=Foto" alt="Foto de Perfil">
+                    <button type="button" class="upload-btn" id="uploadBtn" title="Cambiar foto">
+                        📷
+                    </button>
+                </div>
+                <input type="file" id="photoInput" accept="image/*" style="display: none;">
+            </div>
+
+            <!-- Profile Form -->
+            <form id="profileForm" class="profile-form">
+                <!-- Full Name -->
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        placeholder="Nombre Completo"
+                        required
+                    >
+                    <span class="form-label">Nombre Completo</span>
+                </div>
+
+                <!-- Email (Disabled) -->
+                <div class="form-group">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="Email"
+                        disabled
+                    >
+                    <span class="form-label">Email</span>
+                </div>
+
+                <!-- Avatar URL -->
+                <div class="form-group">
+                    <input 
+                        type="url" 
+                        id="avatarUrl" 
+                        placeholder="URL de foto (opcional)"
+                    >
+                    <span class="form-label">URL de Foto</span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-large">
+                    Guardar Cambios
+                </button>
+            </form>
+
+            <!-- Status Messages -->
+            <div id="loadingMessage" class="loading-indicator">
+                <div class="spinner"></div>
+                <span>Actualizando perfil...</span>
+            </div>
+
+            <div id="successMessage" class="success-message">
+                <span>✓ Perfil actualizado exitosamente</span>
+            </div>
+
+            <div id="errorMessage" class="error-message">
+                <span id="errorText">Error al actualizar el perfil</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/perfil.js"></script>
+</body>
+</html>

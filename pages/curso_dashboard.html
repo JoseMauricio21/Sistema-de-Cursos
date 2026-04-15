@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursos - English Learning Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/curso_dashboard_styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Video Background -->
+            <video class="bg-video" autoplay muted loop>
+                <source src="https://videos.pexels.com/video-files/31105801/13291273_3840_2160_30fps.mp4" type="video/mp4">
+            </video>
+
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <img src="../images/logo t.png" alt="Logo" class="header-logo">
+                    </div>
+                </div>
+
+                <nav class="header-nav">
+                    <div class="radio-inputs">
+                        <label class="radio">
+                            <input type="radio" name="nav-radio" value="inicio" checked>
+                            <span class="name">
+                                <i class="fas fa-home"></i>
+                                <span>Inicio</span>
+                            </span>
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="nav-radio" value="mis-cursos">
+                            <span class="name">
+                                <i class="fas fa-book"></i>
+                                <span>Mis Cursos</span>
+                            </span>
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="nav-radio" value="examenes">
+                            <span class="name">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Exámenes</span>
+                            </span>
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="nav-radio" value="mis-calificaciones">
+                            <span class="name">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Mis Calificaciones</span>
+                            </span>
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="nav-radio" value="en-vivo">
+                            <span class="name">
+                                <i class="fas fa-video"></i>
+                                <span>En Vivo</span>
+                            </span>
+                        </label>
+                    </div>
+                </nav>
+
+                <div class="header-right">
+                    <a href="#" class="logout-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Page Title -->
+            <div class="page-title">
+                <h1 id="pageTitle">Inicio</h1>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="content-wrapper" id="contentWrapper">
+                <!-- Contenido dinámico se cargará aquí -->
+            </div>
+
+            <!-- Floating Action Button -->
+            <button class="fab-add-course" title="Unirse a un curso">
+                <i class="fas fa-plus"></i>
+            </button>
+
+            <!-- Modal para código de acceso -->
+            <div class="modal-overlay" id="courseCodeModal">
+                <div class="modal-content">
+                    <button class="modal-close" id="modalClose">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2>Inserta tu código de acceso de curso</h2>
+                    <form id="courseCodeForm">
+                        <input type="text" id="courseCode" placeholder="Código de acceso" required>
+                        <button type="submit" class="btn btn-primary">Unirse al Curso</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/curso_dashboard.js"></script>
+</body>
+</html>
