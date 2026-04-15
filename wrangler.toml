@@ -1,9 +1,3 @@
-name = "pagina-de-ingles"
-type = "javascript"
-compatibility_date = "2026-04-15"
+# This file is not needed for Cloudflare Pages static site
+# Configuration is handled in Cloudflare dashboard
 
-[env.production]
-name = "pagina-de-ingles-prod"
-
-[env.staging]
-name = "pagina-de-ingles-staging"
