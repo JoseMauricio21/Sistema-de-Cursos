@@ -45,6 +45,11 @@ function initializeDashboard() {
         return;
     }
 
+    if (user.role === 'admin') {
+        window.location.href = '/pages/admin_dashboard.html';
+        return;
+    }
+
     if (user.name) {
         const welcomeUsername = document.getElementById('welcomeUsername');
         if (welcomeUsername) {
@@ -158,6 +163,18 @@ async function loadSectionContent(section) {
                 });
             }
         }
+
+        if (section === 'mis-cursos') {
+            await loadAssignedCourses();
+        }
+
+        if (section === 'examenes') {
+            await loadAssignedExams();
+        }
+
+        if (section === 'en-vivo') {
+            await loadAssignedLives();
+        }
     } catch (error) {
         console.error('Error loading section:', error);
         contentWrapper.innerHTML = '<p>Error al cargar el contenido</p>';
@@ -223,6 +240,263 @@ async function loadProfileFromSupabase() {
     } catch (error) {
         console.error('❌ Error loading profile from Supabase:', error);
     }
+}
+
+function getCurrentSessionUser() {
+    try {
+        return JSON.parse(sessionStorage.getItem('user') || '{}');
+    } catch (error) {
+        return {};
+    }
+}
+
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function renderStudentEmpty(target, iconClass, title, subtitle) {
+    if (!target) {
+        return;
+    }
+
+    target.innerHTML = `
+        <div class="empty-state">
+            <i class="fas ${iconClass}"></i>
+            <p>${escapeHtml(title)}</p>
+            <p class="small-text">${escapeHtml(subtitle)}</p>
+        </div>
+    `;
+}
+
+async function loadAssignedCourses() {
+    const container = document.getElementById('studentCoursesGrid') || document.querySelector('.courses-grid');
+    if (!container) {
+        return;
+    }
+
+    const user = getCurrentSessionUser();
+    if (!user.id) {
+        renderStudentEmpty(container, 'fa-user-lock', 'No tienes sesion activa', 'Inicia sesion para ver tus cursos.');
+        return;
+    }
+
+    const { data: assignments, error: assignmentError } = await supabaseClient
+        .from('course_assignments')
+        .select('course_id')
+        .eq('student_id', user.id)
+        .eq('is_visible', true);
+
+    if (assignmentError) {
+        renderStudentEmpty(container, 'fa-book', 'No se pudieron cargar tus cursos', assignmentError.message);
+        return;
+    }
+
+    if (!assignments?.length) {
+        renderStudentEmpty(container, 'fa-book', 'Aun no tienes cursos asignados', 'Tu admin puede asignarte cursos desde el panel de administracion.');
+        return;
+    }
+
+    const courseIds = assignments.map((item) => item.course_id);
+    const { data: courses, error: courseError } = await supabaseClient
+        .from('courses')
+        .select('id, title, description, cover_image_url, status')
+        .in('id', courseIds)
+        .order('created_at', { ascending: false });
+
+    if (courseError) {
+        renderStudentEmpty(container, 'fa-book', 'No se pudieron cargar detalles de cursos', courseError.message);
+        return;
+    }
+
+    if (!courses?.length) {
+        renderStudentEmpty(container, 'fa-book', 'Sin cursos visibles', 'No hay cursos publicados para tu usuario.');
+        return;
+    }
+
+    container.innerHTML = courses
+        .map((course) => `
+            <article class="course-card">
+                <div class="course-header">
+                    <img class="course-image" src="${escapeHtml(course.cover_image_url || '../images/logo t.png')}" alt="Portada del curso">
+                    <span class="course-badge">${escapeHtml(course.status === 'published' ? 'Disponible' : 'Borrador')}</span>
+                </div>
+                <div class="course-body">
+                    <h3>${escapeHtml(course.title)}</h3>
+                    <p class="course-description">${escapeHtml(course.description || 'Curso sin descripcion')}</p>
+                </div>
+                <div class="course-footer">
+                    <button class="btn btn-primary">Continuar</button>
+                </div>
+            </article>
+        `)
+        .join('');
+}
+
+async function loadAssignedExams() {
+    const container = document.getElementById('studentExamsList') || document.querySelector('.exams-list');
+    if (!container) {
+        return;
+    }
+
+    const user = getCurrentSessionUser();
+    if (!user.id) {
+        renderStudentEmpty(container, 'fa-file-alt', 'No tienes sesion activa', 'Inicia sesion para ver tus examenes.');
+        return;
+    }
+
+    const { data: assignments, error: assignmentError } = await supabaseClient
+        .from('exam_assignments')
+        .select('exam_id, status, score')
+        .eq('student_id', user.id)
+        .order('assigned_at', { ascending: false });
+
+    if (assignmentError) {
+        renderStudentEmpty(container, 'fa-file-alt', 'No se pudieron cargar tus examenes', assignmentError.message);
+        return;
+    }
+
+    if (!assignments?.length) {
+        renderStudentEmpty(container, 'fa-file-alt', 'No hay examenes asignados', 'Cuando el admin te asigne examenes apareceran aqui.');
+        return;
+    }
+
+    const examIds = assignments.map((item) => item.exam_id);
+    const { data: exams, error: examError } = await supabaseClient
+        .from('exams')
+        .select('id, title, description, available_from, status')
+        .in('id', examIds);
+
+    if (examError) {
+        renderStudentEmpty(container, 'fa-file-alt', 'No se pudieron cargar detalles de examenes', examError.message);
+        return;
+    }
+
+    const assignmentMap = new Map(assignments.map((item) => [item.exam_id, item]));
+
+    container.innerHTML = (exams || [])
+        .sort((a, b) => new Date(b.available_from || 0) - new Date(a.available_from || 0))
+        .map((exam) => {
+            const assignment = assignmentMap.get(exam.id) || {};
+            const examDate = exam.available_from ? new Date(exam.available_from) : null;
+            const day = examDate ? String(examDate.getDate()).padStart(2, '0') : '--';
+            const month = examDate
+                ? examDate.toLocaleDateString('es-ES', { month: 'short' })
+                : 'sin fecha';
+
+            const isCompleted = assignment.status === 'completed';
+            const buttonText = isCompleted ? 'Revisar' : 'Empezar';
+            const scoreText = isCompleted && assignment.score !== null && assignment.score !== undefined
+                ? `Calificacion: ${assignment.score}`
+                : 'Pendiente';
+
+            return `
+                <article class="exam-card ${isCompleted ? 'completed' : ''}">
+                    <div class="exam-date">
+                        <span class="day">${day}</span>
+                        <span class="month">${escapeHtml(month)}</span>
+                    </div>
+                    <div class="exam-details">
+                        <h3>${escapeHtml(exam.title)}</h3>
+                        <p class="exam-course">${escapeHtml(exam.description || 'Examen asignado por tu admin')}</p>
+                        <p class="exam-time">Estado: ${escapeHtml(assignment.status || exam.status || 'assigned')}</p>
+                        <p class="exam-score">${escapeHtml(scoreText)}</p>
+                    </div>
+                    <button class="btn btn-primary">${buttonText}</button>
+                </article>
+            `;
+        })
+        .join('');
+}
+
+async function loadAssignedLives() {
+    const container = document.getElementById('liveClassesList') || document.querySelector('.live-classes-list');
+    if (!container) {
+        return;
+    }
+
+    const user = getCurrentSessionUser();
+    if (!user.id) {
+        renderStudentEmpty(container, 'fa-video', 'No tienes sesion activa', 'Inicia sesion para ver lives.');
+        return;
+    }
+
+    const { data: assignments, error: assignmentError } = await supabaseClient
+        .from('live_assignments')
+        .select('live_id')
+        .eq('student_id', user.id)
+        .eq('is_visible', true)
+        .order('assigned_at', { ascending: false });
+
+    if (assignmentError) {
+        renderStudentEmpty(container, 'fa-video', 'No se pudieron cargar lives', assignmentError.message);
+        return;
+    }
+
+    if (!assignments?.length) {
+        renderStudentEmpty(container, 'fa-video', 'No hay lives asignados', 'Tu admin aun no ha publicado lives para ti.');
+        return;
+    }
+
+    const liveIds = assignments.map((item) => item.live_id);
+    const { data: lives, error: liveError } = await supabaseClient
+        .from('live_events')
+        .select('id, title, description, youtube_url, starts_at, status')
+        .in('id', liveIds)
+        .eq('status', 'published')
+        .order('starts_at', { ascending: false });
+
+    if (liveError) {
+        renderStudentEmpty(container, 'fa-video', 'No se pudieron cargar detalles de lives', liveError.message);
+        return;
+    }
+
+    if (!lives?.length) {
+        renderStudentEmpty(container, 'fa-video', 'No hay lives publicados', 'Tus lives asignados estan en borrador o aun no se publican.');
+        return;
+    }
+
+    container.innerHTML = lives
+        .map((live) => {
+            const liveDate = live.starts_at ? new Date(live.starts_at) : null;
+            const timeText = liveDate
+                ? liveDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                : 'Sin hora';
+            const dateText = liveDate
+                ? liveDate.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' })
+                : 'Sin fecha';
+
+            return `
+                <article class="live-class-card live">
+                    <div class="live-indicator">
+                        <span class="live-badge">LIVE</span>
+                    </div>
+                    <div class="class-schedule">
+                        <span class="time">${escapeHtml(timeText)}</span>
+                        <span class="date">${escapeHtml(dateText)}</span>
+                    </div>
+                    <div class="class-info">
+                        <h3>${escapeHtml(live.title)}</h3>
+                        <p class="class-time">${escapeHtml(live.description || 'Live asignado por tu admin')}</p>
+                    </div>
+                    <button class="btn btn-primary" data-live-url="${escapeHtml(live.youtube_url)}">Unirme ahora</button>
+                </article>
+            `;
+        })
+        .join('');
+
+    container.querySelectorAll('[data-live-url]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const url = button.getAttribute('data-live-url');
+            if (url) {
+                window.open(url, '_blank', 'noopener');
+            }
+        });
+    });
 }
 
 // ========================================

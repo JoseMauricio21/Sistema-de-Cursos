@@ -45,6 +45,11 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+function validateUsername(username) {
+    const re = /^[a-zA-Z0-9._-]{3,30}$/;
+    return re.test(username);
+}
+
 // Validar contraseña
 function validatePassword(password) {
     return password.length >= 6;
@@ -108,7 +113,7 @@ async function fetchUserProfile(userId) {
 
     const { data, error } = await client
         .from('profiles')
-        .select('id, email, full_name, role, avatar_url')
+        .select('id, email, full_name, username, role, avatar_url')
         .eq('id', userId)
         .maybeSingle();
 
@@ -127,6 +132,7 @@ async function ensureUserProfile(user, fullName) {
     }
 
     const fallbackName = fullName || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Estudiante';
+    const fallbackUsername = (user.user_metadata?.username || user.email?.split('@')[0] || '').toLowerCase() || null;
 
     // Intento 1: usar la RPC si existe
     try {
@@ -153,6 +159,7 @@ async function ensureUserProfile(user, fullName) {
                 id: user.id,
                 email: user.email,
                 full_name: fallbackName,
+                username: fallbackUsername,
             },
             { onConflict: 'id' }
         );
@@ -169,9 +176,43 @@ function buildLocalUser(user, profile, fallbackName) {
         id: user?.id || '',
         email: profile?.email || user?.email || '',
         name: profile?.full_name || user?.user_metadata?.full_name || fallbackName || nameFromEmail,
+        username: profile?.username || user?.user_metadata?.username || nameFromEmail,
         role: profile?.role || user?.user_metadata?.role || 'student',
         avatar_url: profile?.avatar_url || null,
     };
+}
+
+async function resolveEmailForLogin(loginIdentifier) {
+    const normalized = loginIdentifier.trim().toLowerCase();
+
+    if (normalized.includes('@')) {
+        if (!validateEmail(normalized)) {
+            throw new Error('El email no es valido.');
+        }
+        return normalized;
+    }
+
+    if (!validateUsername(normalized)) {
+        throw new Error('El usuario debe tener 3-30 caracteres y solo letras, numeros, punto, guion o guion bajo.');
+    }
+
+    const client = getSupabaseClient();
+    if (!client) {
+        throw new Error('No se pudo inicializar Supabase.');
+    }
+
+    const { data, error } = await client
+        .rpc('resolve_login_email', { p_identifier: normalized });
+
+    if (error) {
+        throw new Error('No se pudo resolver el usuario. Verifica la funcion SQL resolve_login_email.');
+    }
+
+    if (!data) {
+        throw new Error('Usuario no encontrado.');
+    }
+
+    return data;
 }
 
 async function redirectIfAuthenticated() {
@@ -195,7 +236,7 @@ async function redirectIfAuthenticated() {
     }
 
     if (localUser.role === 'admin') {
-        window.location.href = '/pages/admin.html';
+        window.location.href = '/pages/admin_dashboard.html';
         return;
     }
 
@@ -206,7 +247,7 @@ async function redirectIfAuthenticated() {
 async function validateLoginForm(event) {
     event.preventDefault();
 
-    const email = document.getElementById('email').value.trim();
+    const loginIdentifier = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
     let isValid = true;
@@ -215,11 +256,14 @@ async function validateLoginForm(event) {
     document.querySelectorAll('.error-message').forEach(el => el.remove());
 
     // Validar email
-    if (!email) {
-        showError('email', 'El email es requerido');
+    if (!loginIdentifier) {
+        showError('email', 'El usuario o email es requerido');
         isValid = false;
-    } else if (!validateEmail(email)) {
-        showError('email', 'El email no es válido');
+    } else if (loginIdentifier.includes('@') && !validateEmail(loginIdentifier)) {
+        showError('email', 'El email no es valido');
+        isValid = false;
+    } else if (!loginIdentifier.includes('@') && !validateUsername(loginIdentifier.toLowerCase())) {
+        showError('email', 'El usuario no es valido');
         isValid = false;
     }
 
@@ -243,8 +287,10 @@ async function validateLoginForm(event) {
     }
 
     try {
+        const resolvedEmail = await resolveEmailForLogin(loginIdentifier);
+
         const { data, error } = await client.auth.signInWithPassword({
-            email,
+            email: resolvedEmail,
             password,
         });
 
@@ -264,7 +310,7 @@ async function validateLoginForm(event) {
         }
 
         if (localUser.role === 'admin') {
-            window.location.href = '/pages/admin.html';
+            window.location.href = '/pages/admin_dashboard.html';
         } else {
             window.location.href = '/pages/curso_dashboard.html';
         }
@@ -343,6 +389,7 @@ async function validateRegisterForm(event) {
             options: {
                 data: {
                     full_name: fullname,
+                    username: email.split('@')[0].toLowerCase(),
                 },
                 emailRedirectTo: `${window.location.origin}/pages/login.html`,
             },

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning Platform</title>
+    <link rel="stylesheet" href="../css/admin_dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <div class="brand-block">
+                <div class="brand-title">Admin Studio</div>
+                <p class="brand-subtitle">Gestion de cursos, alumnos, lives, examenes y grupos</p>
+            </div>
+
+            <nav class="side-nav" id="adminNav">
+                <button class="active" data-section="coursesSection">Cursos</button>
+                <button data-section="createCourseSection">Crear curso</button>
+                <button data-section="studentsSection">Alumnos</button>
+                <button data-section="liveSection">Hacer live</button>
+                <button data-section="examsSection">Examenes</button>
+                <button data-section="groupsSection">Mis grupos</button>
+                <button data-section="createGroupSection">Crear grupo</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger" id="adminLogoutBtn">Cerrar sesion</button>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 id="sectionTitle">Cursos</h1>
+                <div class="admin-user-chip">
+                    <span>Admin:</span>
+                    <strong id="adminUserName">-</strong>
+                </div>
+            </header>
+
+            <section class="section-card active" id="coursesSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Cursos creados</h2>
+                        <p class="card-subtitle">Listado de cursos publicados y en borrador</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshCoursesBtn">Actualizar</button>
+                </div>
+                <div class="list-board" id="coursesList"></div>
+            </section>
+
+            <section class="section-card" id="createCourseSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Crear nuevo curso</h2>
+                        <p class="card-subtitle">Constructor con lecciones, bloques multimedia y preguntas tipo forms</p>
+                    </div>
+                </div>
+
+                <form id="createCourseForm" class="stack">
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="courseTitle">Titulo del curso</label>
+                            <input id="courseTitle" type="text" required placeholder="Ej. Ingles A1 Intensivo">
+                        </div>
+                        <div class="stack">
+                            <label for="courseCover">Imagen de portada (URL)</label>
+                            <input id="courseCover" type="url" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="courseStatus">Estado</label>
+                            <select id="courseStatus">
+                                <option value="draft">Borrador</option>
+                                <option value="published">Publicado</option>
+                            </select>
+                        </div>
+                        <div class="stack">
+                            <label for="courseAssignedStudents">Asignar alumnos</label>
+                            <select id="courseAssignedStudents" multiple></select>
+                            <label class="inline-help"><input id="courseAssignAll" type="checkbox"> Asignar a todos los alumnos</label>
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <label for="courseDescription">Descripcion</label>
+                        <textarea id="courseDescription" placeholder="Descripcion general del curso"></textarea>
+                    </div>
+
+                    <div class="mini-card stack">
+                        <h3>Compositor de leccion</h3>
+
+                        <div class="grid-2">
+                            <div class="stack">
+                                <label for="lessonTitle">Titulo de la leccion</label>
+                                <input id="lessonTitle" type="text" placeholder="Ej. Present simple">
+                            </div>
+                            <div class="stack">
+                                <label for="lessonDescription">Descripcion de la leccion</label>
+                                <input id="lessonDescription" type="text" placeholder="Objetivos de esta leccion">
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="stack">
+                                <label for="lessonBlockType">Tipo de bloque</label>
+                                <select id="lessonBlockType">
+                                    <option value="text">Texto</option>
+                                    <option value="image">Imagen</option>
+                                    <option value="youtube">Video de YouTube</option>
+                                </select>
+                            </div>
+                            <div class="stack">
+                                <label for="lessonBlockUrl">URL (imagen o video)</label>
+                                <input id="lessonBlockUrl" type="url" placeholder="https://...">
+                            </div>
+                            <div class="stack">
+                                <label for="lessonBlockText">Texto del bloque</label>
+                                <input id="lessonBlockText" type="text" placeholder="Contenido para este bloque">
+                            </div>
+                        </div>
+
+                        <div class="actions-row">
+                            <button class="btn btn-secondary" type="button" id="addLessonBlockBtn">Agregar bloque</button>
+                        </div>
+                        <div id="lessonBlocksDraft" class="list-board"></div>
+
+                        <hr>
+
+                        <div class="grid-3">
+                            <div class="stack">
+                                <label for="lessonQuestionText">Pregunta</label>
+                                <input id="lessonQuestionText" type="text" placeholder="Escribe la pregunta">
+                            </div>
+                            <div class="stack">
+                                <label for="lessonQuestionOptions">Opciones (coma o salto de linea)</label>
+                                <input id="lessonQuestionOptions" type="text" placeholder="Opcion 1, Opcion 2, Opcion 3">
+                            </div>
+                            <div class="stack">
+                                <label for="lessonQuestionAnswer">Respuesta correcta (numero o texto)</label>
+                                <input id="lessonQuestionAnswer" type="text" placeholder="1 o texto exacto">
+                            </div>
+                        </div>
+
+                        <div class="actions-row">
+                            <button class="btn btn-secondary" type="button" id="addLessonQuestionBtn">Agregar pregunta</button>
+                        </div>
+                        <div id="lessonQuestionsDraft" class="list-board"></div>
+
+                        <div class="actions-row">
+                            <button class="btn btn-primary" type="button" id="addLessonDraftBtn">Guardar leccion en borrador del curso</button>
+                        </div>
+                    </div>
+
+                    <div class="mini-card">
+                        <h3>Lecciones en borrador para este curso</h3>
+                        <div id="lessonDraftList" class="list-board"></div>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="btn btn-primary" type="submit">Crear curso completo</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="section-card" id="studentsSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Alumnos registrados</h2>
+                        <p class="card-subtitle">Editar correo, contrasena, nombre de usuario y foto</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshStudentsBtn">Actualizar</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section-card" id="liveSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Hacer live de YouTube</h2>
+                        <p class="card-subtitle">Publica un live y selecciona que alumnos lo veran en su dashboard</p>
+                    </div>
+                </div>
+
+                <form id="liveForm" class="stack">
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="liveTitle">Titulo del live</label>
+                            <input id="liveTitle" type="text" required>
+                        </div>
+                        <div class="stack">
+                            <label for="liveYoutubeUrl">URL de YouTube</label>
+                            <input id="liveYoutubeUrl" type="url" required placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="liveStartsAt">Fecha/Hora (opcional)</label>
+                            <input id="liveStartsAt" type="datetime-local">
+                        </div>
+                        <div class="stack">
+                            <label for="liveStatus">Estado</label>
+                            <select id="liveStatus">
+                                <option value="draft">Borrador</option>
+                                <option value="published">Publicado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <label for="liveDescription">Descripcion</label>
+                        <textarea id="liveDescription"></textarea>
+                    </div>
+
+                    <div class="stack">
+                        <label for="liveTargetStudents">Selecciona alumnos objetivo</label>
+                        <select id="liveTargetStudents" multiple></select>
+                        <label class="inline-help"><input id="liveForAll" type="checkbox"> Publicar para todos los alumnos</label>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="btn btn-primary" type="submit">Publicar live</button>
+                    </div>
+                </form>
+
+                <div class="mini-card" style="margin-top: 16px;">
+                    <h3>Lives creados</h3>
+                    <div id="liveEventsList" class="list-board"></div>
+                </div>
+            </section>
+
+            <section class="section-card" id="examsSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Examenes (forms completo)</h2>
+                        <p class="card-subtitle">Crea preguntas, publica examen y asigna alumnos</p>
+                    </div>
+                </div>
+
+                <form id="examForm" class="stack">
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="examTitle">Titulo del examen</label>
+                            <input id="examTitle" type="text" required>
+                        </div>
+                        <div class="stack">
+                            <label for="examStatus">Estado</label>
+                            <select id="examStatus">
+                                <option value="draft">Borrador</option>
+                                <option value="published">Publicado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="examAvailableFrom">Disponible desde</label>
+                            <input id="examAvailableFrom" type="datetime-local">
+                        </div>
+                        <div class="stack">
+                            <label for="examAvailableTo">Disponible hasta</label>
+                            <input id="examAvailableTo" type="datetime-local">
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <label for="examDescription">Descripcion</label>
+                        <textarea id="examDescription"></textarea>
+                    </div>
+
+                    <div class="mini-card stack">
+                        <h3>Constructor de preguntas</h3>
+                        <div class="grid-3">
+                            <div class="stack">
+                                <label for="examQuestionText">Pregunta</label>
+                                <input id="examQuestionText" type="text">
+                            </div>
+                            <div class="stack">
+                                <label for="examQuestionOptions">Opciones (coma o salto de linea)</label>
+                                <input id="examQuestionOptions" type="text" placeholder="A, B, C">
+                            </div>
+                            <div class="stack">
+                                <label for="examQuestionAnswer">Respuesta correcta</label>
+                                <input id="examQuestionAnswer" type="text" placeholder="1 o texto">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="stack">
+                                <label for="examQuestionPoints">Puntos</label>
+                                <input id="examQuestionPoints" type="number" min="1" step="1" value="1">
+                            </div>
+                        </div>
+                        <div class="actions-row">
+                            <button class="btn btn-secondary" type="button" id="addExamQuestionBtn">Agregar pregunta al examen</button>
+                        </div>
+                        <div id="examQuestionsDraft" class="list-board"></div>
+                    </div>
+
+                    <div class="stack">
+                        <label for="examTargetStudents">Selecciona alumnos objetivo</label>
+                        <select id="examTargetStudents" multiple></select>
+                        <label class="inline-help"><input id="examForAll" type="checkbox"> Asignar a todos los alumnos</label>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="btn btn-primary" type="submit">Crear y asignar examen</button>
+                    </div>
+                </form>
+
+                <div class="mini-card" style="margin-top: 16px;">
+                    <h3>Examenes creados</h3>
+                    <div id="examsList" class="list-board"></div>
+                </div>
+            </section>
+
+            <section class="section-card" id="groupsSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Mis grupos</h2>
+                        <p class="card-subtitle">Visualiza grupos creados y sus miembros</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshGroupsBtn">Actualizar</button>
+                </div>
+
+                <div id="groupsList" class="list-board"></div>
+            </section>
+
+            <section class="section-card" id="createGroupSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Crear grupo</h2>
+                        <p class="card-subtitle">Selecciona alumnos registrados y asignalos a un grupo</p>
+                    </div>
+                </div>
+
+                <form id="createGroupForm" class="stack">
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="groupName">Nombre del grupo</label>
+                            <input id="groupName" type="text" required placeholder="Ej. Grupo A1 Manana">
+                        </div>
+                        <div class="stack">
+                            <label for="groupDescription">Descripcion</label>
+                            <input id="groupDescription" type="text" placeholder="Descripcion del grupo">
+                        </div>
+                    </div>
+
+                    <div class="selector-grid">
+                        <div class="stack">
+                            <label for="groupStudentMembers">Alumnos del grupo</label>
+                            <select id="groupStudentMembers" multiple></select>
+                        </div>
+                        <div class="stack">
+                            <label for="groupCourseList">Cursos para asignar al grupo (opcional)</label>
+                            <select id="groupCourseList" multiple></select>
+                        </div>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="btn btn-primary" type="submit">Crear grupo</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="studentEditModal">
+        <div class="modal-card">
+            <h3>Editar alumno</h3>
+            <input type="hidden" id="editStudentId">
+
+            <div class="grid-2">
+                <div class="stack">
+                    <label for="editStudentName">Nombre completo</label>
+                    <input id="editStudentName" type="text">
+                </div>
+                <div class="stack">
+                    <label for="editStudentUsername">Usuario</label>
+                    <input id="editStudentUsername" type="text" placeholder="usuario">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="stack">
+                    <label for="editStudentEmail">Email</label>
+                    <input id="editStudentEmail" type="email">
+                </div>
+                <div class="stack">
+                    <label for="editStudentPassword">Nueva contrasena (opcional)</label>
+                    <input id="editStudentPassword" type="password" placeholder="Dejar vacio para no cambiar">
+                </div>
+            </div>
+
+            <div class="stack">
+                <label for="editStudentAvatar">Foto (URL)</label>
+                <input id="editStudentAvatar" type="url" placeholder="https://...">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-muted" id="cancelStudentEditBtn" type="button">Cancelar</button>
+                <button class="btn btn-primary" id="saveStudentEditBtn" type="button">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="adminLogoutModal">
+        <div class="modal-card">
+            <h3>Cerrar sesion</h3>
+            <p class="card-subtitle">Quieres cerrar tu sesion de administracion?</p>
+            <div class="modal-actions">
+                <button class="btn btn-muted" id="cancelAdminLogoutBtn" type="button">Cancelar</button>
+                <button class="btn btn-danger" id="confirmAdminLogoutBtn" type="button">Si, cerrar sesion</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <script src="../js/admin_dashboard.js"></script>
+</body>
+</html>

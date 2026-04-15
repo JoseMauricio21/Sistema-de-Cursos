@@ -7,6 +7,7 @@ Este directorio contiene la configuración y utilidades para conectar la aplicac
 - **supabaseConfig.js** - Configuración de conexión a Supabase
 - **authUtils.js** - Funciones de autenticación y gestión de usuarios
 - **schema.sql** - Script SQL para crear las tablas en Supabase
+- **04_admin_dashboard_schema.sql** - Esquema completo del nuevo dashboard admin (cursos, lecciones, lives, examenes, grupos y permisos)
 
 ## Pasos para Configurar Supabase
 
@@ -29,9 +30,18 @@ Este directorio contiene la configuración y utilidades para conectar la aplicac
 ### 3. Crear Tablas
 1. En Supabase, ve a "SQL Editor"
 2. Haz clic en "New Query"
-3. Copia todo el contenido de `schema.sql`
-4. Pega en el editor SQL
-5. Haz clic en "Run"
+3. Ejecuta primero `schema.sql` (si es un proyecto nuevo)
+4. Ejecuta después `fix_rls_policies.sql` (si necesitas trigger/permisos base)
+5. Ejecuta después `04_admin_dashboard_schema.sql` para habilitar el nuevo panel admin
+6. Haz clic en "Run" en cada script
+
+### 3.1 Configurar Admin Tiffany
+Después de ejecutar `04_admin_dashboard_schema.sql`:
+1. Crea una usuaria en Authentication > Users
+   - Email sugerido: `tiffany.admin@plataforma.com`
+   - Password: `acceso1@`
+2. Ejecuta el bloque "TIFFANY ADMIN SETUP" que viene al final de `04_admin_dashboard_schema.sql`
+3. Con eso podrá iniciar con usuario `tiff` (username) en el login de la app
 
 ### 4. Configurar Autenticación
 1. Ve a "Authentication" en Supabase
