@@ -1,16 +1,18 @@
 {
   "name": "pagina-de-ingles",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "Sitio de inglés con Vite bundler en Cloudflare Pages",
+  "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.1.0"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.103.0",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
     "gsap": "^3.15.0"
   }
 }
