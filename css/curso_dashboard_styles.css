@@ -1863,6 +1863,78 @@ html, body {
     width: 100%;
 }
 
+/* Logout confirmation modal */
+.logout-modal {
+    max-width: 460px;
+    text-align: center;
+    padding: 32px 32px 28px;
+}
+
+.logout-modal-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 10px 24px rgba(239, 68, 68, 0.35);
+}
+
+.logout-modal-subtitle {
+    margin: 8px 0 24px;
+    color: var(--text-light);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.logout-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.logout-modal-actions .btn {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+}
+
+.btn-neutral {
+    background: #f3f4f6;
+    color: #111827;
+    border: 1px solid #d1d5db;
+}
+
+.btn-neutral:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.btn-danger-solid {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    border: 1px solid #b91c1c;
+    box-shadow: 0 8px 18px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger-solid:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+    .logout-modal {
+        padding: 28px 22px 22px;
+    }
+
+    .logout-modal-actions {
+        flex-direction: column;
+    }
+}
+
 
 /* ========================================
    PROFILE LINK BUTTON

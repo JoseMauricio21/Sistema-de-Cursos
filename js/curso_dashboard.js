@@ -231,13 +231,45 @@ async function loadProfileFromSupabase() {
 
 function initializeLogout() {
     const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutConfirmModal');
+    const closeModalBtn = document.getElementById('logoutModalClose');
+    const cancelBtn = document.getElementById('logoutCancelBtn');
+    const confirmBtn = document.getElementById('logoutConfirmBtn');
+
+    if (!logoutBtn || !logoutModal || !closeModalBtn || !cancelBtn || !confirmBtn) {
+        return;
+    }
+
+    const openLogoutModal = () => {
+        logoutModal.classList.add('visible');
+    };
+
+    const closeLogoutModal = () => {
+        logoutModal.classList.remove('visible');
+    };
 
     logoutBtn.addEventListener('click', function(e) {
         e.preventDefault();
+        openLogoutModal();
+    });
 
-        // Confirm logout
-        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-            logout();
+    closeModalBtn.addEventListener('click', closeLogoutModal);
+    cancelBtn.addEventListener('click', closeLogoutModal);
+
+    logoutModal.addEventListener('click', function(e) {
+        if (e.target === logoutModal) {
+            closeLogoutModal();
+        }
+    });
+
+    confirmBtn.addEventListener('click', async function() {
+        closeLogoutModal();
+        await logout();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && logoutModal.classList.contains('visible')) {
+            closeLogoutModal();
         }
     });
 }

@@ -100,6 +100,24 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Modal profesional para confirmar cierre de sesión -->
+            <div class="modal-overlay" id="logoutConfirmModal" aria-hidden="true">
+                <div class="modal-content logout-modal" role="dialog" aria-modal="true" aria-labelledby="logoutModalTitle" aria-describedby="logoutModalText">
+                    <button class="modal-close" id="logoutModalClose" type="button" aria-label="Cerrar ventana">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="logout-modal-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <h2 id="logoutModalTitle">Cerrar sesión</h2>
+                    <p id="logoutModalText" class="logout-modal-subtitle">¿Quieres cerrar tu sesión ahora?</p>
+                    <div class="logout-modal-actions">
+                        <button type="button" class="btn btn-neutral" id="logoutCancelBtn">Cancelar</button>
+                        <button type="button" class="btn btn-danger-solid" id="logoutConfirmBtn">Sí, cerrar sesión</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
