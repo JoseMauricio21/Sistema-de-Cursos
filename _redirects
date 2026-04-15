@@ -1,13 +1,4 @@
 # Redirects for Cloudflare Pages
-# Ruta de inicio
-/ /index.html 200
-/inicio /pages/inicio.html 200
-/login /pages/login.html 200
-/register /pages/register.html 200
-/admin /pages/admin.html 200
-
-# API routes
-/api/* /server.js 200
-
-# SPA fallback
+# Single Page App fallback
 /* /index.html 200
+
