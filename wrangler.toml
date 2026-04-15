@@ -1,6 +1,6 @@
 # Cloudflare Pages configuration
-# Este archivo le indica a Cloudflare que NO necesita instalar dependencias
+# Este archivo le indica a Cloudflare que es un sitio estático
 
-[build]
-command = ""
-caching_default_max_age = 20160
+name = "pagina-de-ingles"
+type = "javascript"
+compatibility_date = "2026-04-15"
