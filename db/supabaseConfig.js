@@ -1,7 +1,7 @@
 // Configuración de Supabase
 // Obtén estas credenciales de: https://app.supabase.com
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 // CLAVE ANON (PÚBLICA) - Segura para usar en el cliente
 const SUPABASE_URL = 'https://mfhfeytlgmkxuzlclawx.supabase.co';

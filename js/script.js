@@ -1,3 +1,9 @@
+// Supabase configuration for browser auth flows
+const SUPABASE_URL = 'https://mfhfeytlgmkxuzlclawx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_TBRrwMbabN6X0NcO5656ew_imJDTeaj';
+
+let supabaseClient = null;
+
 // Control de video continuo entre páginas
 window.addEventListener('load', function() {
     const video = document.querySelector('.video-bg');
@@ -7,13 +13,20 @@ window.addEventListener('load', function() {
         if (savedTime) {
             video.currentTime = parseFloat(savedTime);
         }
-        
+
         // Guardar el tiempo actual del video cada segundo
         setInterval(function() {
             if (video && !video.paused) {
                 sessionStorage.setItem('videoTime', video.currentTime);
             }
         }, 1000);
+    }
+
+    const isAuthPage = document.getElementById('loginForm') || document.getElementById('registerForm');
+    if (isAuthPage) {
+        redirectIfAuthenticated().catch(error => {
+            console.warn('No se pudo restaurar la sesión:', error.message);
+        });
     }
 });
 
@@ -36,22 +49,156 @@ function validatePassword(password) {
     return password.length >= 6;
 }
 
+function getSupabaseClient() {
+    if (supabaseClient) {
+        return supabaseClient;
+    }
+
+    if (!window.supabase || !window.supabase.createClient) {
+        return null;
+    }
+
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return supabaseClient;
+}
+
+function getFriendlyAuthError(error) {
+    const rawMessage = error?.message || 'Error de autenticación.';
+    const normalized = rawMessage.toLowerCase();
+
+    if (normalized.includes('invalid login credentials')) {
+        return 'Email o contraseña incorrectos.';
+    }
+
+    if (normalized.includes('email not confirmed')) {
+        return 'Debes confirmar tu email antes de iniciar sesión.';
+    }
+
+    if (normalized.includes('user already registered')) {
+        return 'Este email ya está registrado.';
+    }
+
+    if (normalized.includes('password')) {
+        return 'La contraseña no cumple los requisitos mínimos.';
+    }
+
+    return rawMessage;
+}
+
+async function fetchUserProfile(userId) {
+    const client = getSupabaseClient();
+    if (!client || !userId) {
+        return null;
+    }
+
+    const { data, error } = await client
+        .from('profiles')
+        .select('id, email, full_name, role, avatar_url')
+        .eq('id', userId)
+        .maybeSingle();
+
+    if (error) {
+        console.warn('No se pudo leer el perfil:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
+async function ensureUserProfile(user, fullName) {
+    const client = getSupabaseClient();
+    if (!client || !user?.id) {
+        return;
+    }
+
+    const fallbackName = fullName || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Estudiante';
+
+    // Intento 1: usar la RPC si existe
+    try {
+        const { error: rpcError } = await client.rpc('create_user_profile', {
+            user_id: user.id,
+            user_email: user.email,
+            user_full_name: fallbackName,
+        });
+
+        if (!rpcError) {
+            return;
+        }
+
+        console.warn('RPC create_user_profile no disponible:', rpcError.message);
+    } catch (rpcException) {
+        console.warn('No se pudo ejecutar create_user_profile:', rpcException.message);
+    }
+
+    // Intento 2: upsert directo en profiles
+    const { error: upsertError } = await client
+        .from('profiles')
+        .upsert(
+            {
+                id: user.id,
+                email: user.email,
+                full_name: fallbackName,
+            },
+            { onConflict: 'id' }
+        );
+
+    if (upsertError) {
+        console.warn('No se pudo crear perfil automáticamente:', upsertError.message);
+    }
+}
+
+function buildLocalUser(user, profile, fallbackName) {
+    const nameFromEmail = user?.email ? user.email.split('@')[0] : 'Estudiante';
+
+    return {
+        id: user?.id || '',
+        email: profile?.email || user?.email || '',
+        name: profile?.full_name || user?.user_metadata?.full_name || fallbackName || nameFromEmail,
+        role: profile?.role || user?.user_metadata?.role || 'student',
+        avatar_url: profile?.avatar_url || null,
+    };
+}
+
+async function redirectIfAuthenticated() {
+    const client = getSupabaseClient();
+    if (!client) {
+        return;
+    }
+
+    const { data, error } = await client.auth.getSession();
+    if (error || !data?.session?.user) {
+        return;
+    }
+
+    const currentUser = data.session.user;
+    const profile = await fetchUserProfile(currentUser.id);
+    const localUser = buildLocalUser(currentUser, profile);
+
+    localStorage.setItem('user', JSON.stringify(localUser));
+    if (data.session.access_token) {
+        localStorage.setItem('accessToken', data.session.access_token);
+    }
+
+    if (localUser.role === 'admin') {
+        window.location.href = '/pages/admin.html';
+        return;
+    }
+
+    window.location.href = '/pages/curso_dashboard.html';
+}
+
 // Validar formulario de login
 async function validateLoginForm(event) {
     event.preventDefault();
-    
-    console.log('🔴 INICIANDO VALIDACIÓN DE LOGIN');
-    
+
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    
-    console.log('📝 Datos del formulario:', { email, password: password ? '***' : '' });
-    
+
     let isValid = true;
-    
+
     // Limpiar mensajes de error previos
     document.querySelectorAll('.error-message').forEach(el => el.remove());
-    
+
     // Validar email
     if (!email) {
         showError('email', 'El email es requerido');
@@ -60,7 +207,7 @@ async function validateLoginForm(event) {
         showError('email', 'El email no es válido');
         isValid = false;
     }
-    
+
     // Validar contraseña
     if (!password) {
         showError('password', 'La contraseña es requerida');
@@ -69,65 +216,65 @@ async function validateLoginForm(event) {
         showError('password', 'La contraseña debe tener al menos 6 caracteres');
         isValid = false;
     }
-    
-    if (isValid) {
-        try {
-            console.log('📤 Enviando solicitud a /api/login');
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password })
-            });
-            
-            console.log('📥 Respuesta recibida:', response.status);
-            const data = await response.json();
-            console.log('📊 Datos de respuesta:', data);
-            
-            if (response.ok) {
-                // Guardar token y datos de usuario
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                
-                console.log('✅ Login exitoso, redirigiendo...');
-                // Redireccionar según el rol
-                if (data.user.role === 'admin') {
-                    window.location.href = '/pages/admin.html';
-                } else {
-                    window.location.href = '/pages/curso_dashboard.html';
-                }
-            } else {
-                console.error('❌ Error en respuesta:', data.error);
-                showError('email', data.error || 'Error en el login');
-            }
-        } catch (error) {
-            console.error('❌ Error de conexión:', error);
-            showError('email', 'Error de conexión con el servidor');
-        }
+
+    if (!isValid) {
+        return false;
     }
-    
+
+    const client = getSupabaseClient();
+    if (!client) {
+        showError('email', 'No se pudo inicializar Supabase. Recarga la página.');
+        return false;
+    }
+
+    try {
+        const { data, error } = await client.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (error) {
+            showError('email', getFriendlyAuthError(error));
+            return false;
+        }
+
+        const profile = await fetchUserProfile(data.user.id);
+        const localUser = buildLocalUser(data.user, profile);
+
+        localStorage.setItem('user', JSON.stringify(localUser));
+        if (data.session?.access_token) {
+            localStorage.setItem('accessToken', data.session.access_token);
+        } else {
+            localStorage.removeItem('accessToken');
+        }
+
+        if (localUser.role === 'admin') {
+            window.location.href = '/pages/admin.html';
+        } else {
+            window.location.href = '/pages/curso_dashboard.html';
+        }
+    } catch (error) {
+        console.error('Error de login:', error);
+        showError('email', 'Error de conexión con Supabase.');
+    }
+
     return false;
 }
 
 // Validar formulario de registro
 async function validateRegisterForm(event) {
     event.preventDefault();
-    
-    console.log('🔴 INICIANDO VALIDACIÓN DE REGISTRO');
-    
+
     const fullname = document.getElementById('fullname').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
-    
-    console.log('📝 Datos del formulario:', { fullname, email, password: password ? '***' : '', confirmPassword: confirmPassword ? '***' : '' });
-    
+
     let isValid = true;
-    
+
     // Limpiar mensajes de error previos
     document.querySelectorAll('.error-message').forEach(el => el.remove());
-    
+
     // Validar nombre
     if (!fullname) {
         showError('fullname', 'El nombre completo es requerido');
@@ -136,7 +283,7 @@ async function validateRegisterForm(event) {
         showError('fullname', 'El nombre debe tener al menos 3 caracteres');
         isValid = false;
     }
-    
+
     // Validar email
     if (!email) {
         showError('email', 'El email es requerido');
@@ -145,7 +292,7 @@ async function validateRegisterForm(event) {
         showError('email', 'El email no es válido');
         isValid = false;
     }
-    
+
     // Validar contraseña
     if (!password) {
         showError('password', 'La contraseña es requerida');
@@ -154,7 +301,7 @@ async function validateRegisterForm(event) {
         showError('password', 'La contraseña debe tener al menos 6 caracteres');
         isValid = false;
     }
-    
+
     // Validar confirmación de contraseña
     if (!confirmPassword) {
         showError('confirmPassword', 'Debe confirmar la contraseña');
@@ -163,41 +310,69 @@ async function validateRegisterForm(event) {
         showError('confirmPassword', 'Las contraseñas no coinciden');
         isValid = false;
     }
-    
-    if (isValid) {
-        try {
-            console.log('📤 Enviando solicitud a /api/register');
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ fullname, email, password, confirmPassword })
-            });
-            
-            console.log('📥 Respuesta recibida:', response.status);
-            const data = await response.json();
-            console.log('📊 Datos de respuesta:', data);
-            
-            if (response.ok) {
-                alert('¡Registro exitoso! Por favor inicia sesión.');
-                window.location.href = '/pages/login.html';
-            } else {
-                console.error('❌ Error en respuesta:', data.error);
-                showError('email', data.error || 'Error en el registro');
-            }
-        } catch (error) {
-            console.error('❌ Error de conexión:', error);
-            showError('email', 'Error de conexión con el servidor');
-        }
+
+    if (!isValid) {
+        return false;
     }
-    
+
+    const client = getSupabaseClient();
+    if (!client) {
+        showError('email', 'No se pudo inicializar Supabase. Recarga la página.');
+        return false;
+    }
+
+    try {
+        const { data, error } = await client.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullname,
+                },
+                emailRedirectTo: `${window.location.origin}/pages/login.html`,
+            },
+        });
+
+        if (error) {
+            showError('email', getFriendlyAuthError(error));
+            return false;
+        }
+
+        if (data.user) {
+            await ensureUserProfile(data.user, fullname);
+        }
+
+        if (data.session?.user) {
+            const profile = await fetchUserProfile(data.session.user.id);
+            const localUser = buildLocalUser(data.session.user, profile, fullname);
+            localStorage.setItem('user', JSON.stringify(localUser));
+
+            if (data.session.access_token) {
+                localStorage.setItem('accessToken', data.session.access_token);
+            }
+
+            window.location.href = '/pages/curso_dashboard.html';
+            return false;
+        }
+
+        alert('Registro exitoso. Revisa tu email para confirmar la cuenta y luego inicia sesión.');
+        window.location.href = '/pages/login.html';
+    } catch (error) {
+        console.error('Error de registro:', error);
+        showError('email', 'Error de conexión con Supabase.');
+    }
+
     return false;
 }
 
 // Mostrar mensaje de error
 function showError(fieldId, message) {
     const field = document.getElementById(fieldId);
+    if (!field || !field.parentElement) {
+        alert(message);
+        return;
+    }
+
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.textContent = message;
@@ -215,7 +390,21 @@ function togglePasswordVisibility(inputId) {
 }
 
 // Login con Google
-function loginWithGoogle() {
-    alert('Función de Google Login - A implementar con credenciales de Google OAuth');
-    console.log('Iniciando login con Google');
+async function loginWithGoogle() {
+    const client = getSupabaseClient();
+    if (!client) {
+        alert('No se pudo inicializar Supabase.');
+        return;
+    }
+
+    const { error } = await client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: `${window.location.origin}/pages/curso_dashboard.html`,
+        },
+    });
+
+    if (error) {
+        alert('No se pudo iniciar sesión con Google: ' + getFriendlyAuthError(error));
+    }
 }
