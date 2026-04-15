@@ -1,0 +1,6 @@
+# Cloudflare Pages configuration
+# Este archivo le indica a Cloudflare que NO necesita instalar dependencias
+
+[build]
+command = ""
+caching_default_max_age = 20160
