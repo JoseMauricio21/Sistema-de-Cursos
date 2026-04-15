@@ -248,7 +248,8 @@ async function validateLoginForm(event) {
     event.preventDefault();
 
     const loginIdentifier = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    const passwordInput = document.getElementById('password').value;
+    const password = passwordInput;
 
     let isValid = true;
 
@@ -289,10 +290,24 @@ async function validateLoginForm(event) {
     try {
         const resolvedEmail = await resolveEmailForLogin(loginIdentifier);
 
-        const { data, error } = await client.auth.signInWithPassword({
+        let { data, error } = await client.auth.signInWithPassword({
             email: resolvedEmail,
             password,
         });
+
+        // Retry once with trimmed password when users paste credentials with accidental spaces.
+        if (
+            error &&
+            error.message &&
+            error.message.toLowerCase().includes('invalid login credentials') &&
+            passwordInput !== passwordInput.trim() &&
+            passwordInput.trim().length >= 6
+        ) {
+            ({ data, error } = await client.auth.signInWithPassword({
+                email: resolvedEmail,
+                password: passwordInput.trim(),
+            }));
+        }
 
         if (error) {
             showError('email', getFriendlyAuthError(error));
@@ -316,7 +331,7 @@ async function validateLoginForm(event) {
         }
     } catch (error) {
         console.error('Error de login:', error);
-        showError('email', 'Error de conexión con Supabase.');
+        showError('email', getFriendlyAuthError(error));
     }
 
     return false;
