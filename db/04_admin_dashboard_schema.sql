@@ -724,7 +724,7 @@ begin
         end if;
 
         update auth.users
-        set encrypted_password = crypt(v_clean_password, gen_salt('bf')),
+        set encrypted_password = extensions.crypt(v_clean_password, extensions.gen_salt('bf')),
             updated_at = now()
         where id = p_student_id;
     end if;

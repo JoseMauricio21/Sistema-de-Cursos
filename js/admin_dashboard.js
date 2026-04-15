@@ -391,13 +391,17 @@ async function saveStudentChanges() {
     };
 
     let rpcWorked = false;
+    let passwordUpdated = !payload.p_password;
 
     const { error } = await supabaseClient.rpc('admin_update_student_profile', payload);
     if (!error) {
         rpcWorked = true;
+        passwordUpdated = true;
     }
 
     if (!rpcWorked) {
+        console.warn('RPC admin_update_student_profile fallo:', error?.message || error);
+
         const fallbackUpdates = {
             full_name: payload.p_full_name,
             username: payload.p_username,
@@ -414,14 +418,16 @@ async function saveStudentChanges() {
             showToast('No se pudo actualizar alumno: ' + fallbackError.message, 'error');
             return;
         }
-
-        if (payload.p_password) {
-            showToast('Password no actualizado. Ejecuta el SQL para habilitar RPC admin_update_student_profile.', 'warning');
-        }
     }
 
     closeStudentEditModal();
     await loadStudents();
+
+    if (!passwordUpdated) {
+        showToast('Alumno actualizado parcialmente: la contrasena no se pudo cambiar.', 'warning');
+        return;
+    }
+
     showToast('Alumno actualizado correctamente.', 'success');
 }
 
