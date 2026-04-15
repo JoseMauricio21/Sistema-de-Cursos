@@ -4,7 +4,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    minify: 'terser',
+    // Use built-in esbuild minifier to avoid optional terser dependency in CI.
+    minify: 'esbuild',
   },
   server: {
     port: 3000,

@@ -1,8 +1,7 @@
 name = "pagina-de-ingles"
 compatibility_date = "2026-04-15"
 
-[assets]
-directory = "dist"
+pages_build_output_dir = "."
 
 
 

@@ -22,8 +22,11 @@ En el formulario de configuración:
 
 - **Nombre del Proyecto**: `pagina-de-ingles` (o el que prefieras)
 - **Rama de Producción**: `main` (o `master`)
-- **Comando de compilación**: Dejar vacío (es sitio estático)
-- **Directorio de salida de compilación**: `/` (raíz)
+- **Framework preset**: `None`
+- **Comando de compilación**: Dejar vacío (sitio estático multipágina)
+- **Directorio de salida de compilación**: `/` (raíz del proyecto)
+
+> Importante: si ves en logs `Executing user deploy command: npx wrangler versions upload`, el proyecto está usando flujo de **Workers** en vez de **Pages**. En Cloudflare Pages no uses ese comando; configura despliegue estático de la raíz o usa `wrangler pages deploy`.
 
 ### 3. Variables de Entorno (si es necesario)
 
@@ -51,7 +54,7 @@ npm install -g @cloudflare/wrangler
 
 ### Desplegar
 ```bash
-wrangler pages deploy .
+wrangler pages deploy . --project-name pagina-de-ingles
 ```
 
 ## Estructura de Archivos Especiales
