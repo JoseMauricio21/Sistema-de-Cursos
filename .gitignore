@@ -34,5 +34,9 @@ logs/
 .supabase/
 
 # Misc
-node_modules
 .cache
+
+# Cloudflare Workers
+.wrangler/
+.prettierignore
+

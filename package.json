@@ -4,8 +4,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
-    "start": "node server.js",
-    "build": "echo 'Static site - no build needed'"
+    "start": "node server.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
