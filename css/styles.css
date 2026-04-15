@@ -181,11 +181,16 @@ h2 {
     font-size: 1.1em;
 }
 
+.intro-text-small {
+    font-size: 0.85em !important;
+    margin-bottom: 30px !important;
+}
+
 /* Logo Loop Carousel */
 .logo-loop {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
-    margin: 150px calc(-50vw + 50%);
+    margin: 50px calc(-50vw + 50%);
     overflow: hidden;
     position: relative;
     background: transparent;
