@@ -838,9 +838,20 @@ async function createLiveEvent(event) {
     const youtubeUrl = normalizeYoutubeUrl(document.getElementById('liveYoutubeUrl').value.trim());
     const status = document.getElementById('liveStatus').value;
     const startsAtValue = document.getElementById('liveStartsAt').value;
+    const publishForAll = document.getElementById('liveForAll').checked;
+
+    let studentIds = getSelectedValues('liveTargetStudents');
+    if (publishForAll || (status === 'published' && !studentIds.length)) {
+        studentIds = state.students.map((student) => student.id);
+    }
 
     if (!title || !youtubeUrl) {
         showToast('Completa titulo y URL valida de YouTube.', 'warning');
+        return;
+    }
+
+    if (status === 'published' && !studentIds.length) {
+        showToast('No hay alumnos disponibles para asignar este live publicado.', 'warning');
         return;
     }
 
@@ -860,11 +871,6 @@ async function createLiveEvent(event) {
     if (liveError) {
         showToast('No se pudo crear live: ' + liveError.message, 'error');
         return;
-    }
-
-    let studentIds = getSelectedValues('liveTargetStudents');
-    if (document.getElementById('liveForAll').checked) {
-        studentIds = state.students.map((student) => student.id);
     }
 
     if (!studentIds.length) {
@@ -891,7 +897,11 @@ async function createLiveEvent(event) {
 
     document.getElementById('liveForm').reset();
     await loadLiveEvents();
-    showToast('Live creado correctamente.', 'success');
+    if (status === 'published') {
+        showToast(`Live publicado correctamente para ${studentIds.length} alumno(s).`, 'success');
+    } else {
+        showToast('Live creado correctamente en borrador.', 'success');
+    }
 }
 
 async function loadLiveEvents() {
