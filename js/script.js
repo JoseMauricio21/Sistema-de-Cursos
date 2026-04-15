@@ -24,6 +24,7 @@ window.addEventListener('load', function() {
 
     const isAuthPage = document.getElementById('loginForm') || document.getElementById('registerForm');
     if (isAuthPage) {
+        clearLegacyLocalAuthData();
         redirectIfAuthenticated().catch(error => {
             console.warn('No se pudo restaurar la sesión:', error.message);
         });
@@ -49,6 +50,13 @@ function validatePassword(password) {
     return password.length >= 6;
 }
 
+function clearLegacyLocalAuthData() {
+    // Remove legacy keys from previous builds that persisted auth in localStorage.
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('sb-mfhfeytlgmkxuzlclawx-auth-token');
+}
+
 function getSupabaseClient() {
     if (supabaseClient) {
         return supabaseClient;
@@ -58,7 +66,14 @@ function getSupabaseClient() {
         return null;
     }
 
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+            storage: window.sessionStorage,
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+        },
+    });
     return supabaseClient;
 }
 
@@ -174,9 +189,9 @@ async function redirectIfAuthenticated() {
     const profile = await fetchUserProfile(currentUser.id);
     const localUser = buildLocalUser(currentUser, profile);
 
-    localStorage.setItem('user', JSON.stringify(localUser));
+    sessionStorage.setItem('user', JSON.stringify(localUser));
     if (data.session.access_token) {
-        localStorage.setItem('accessToken', data.session.access_token);
+        sessionStorage.setItem('accessToken', data.session.access_token);
     }
 
     if (localUser.role === 'admin') {
@@ -241,11 +256,11 @@ async function validateLoginForm(event) {
         const profile = await fetchUserProfile(data.user.id);
         const localUser = buildLocalUser(data.user, profile);
 
-        localStorage.setItem('user', JSON.stringify(localUser));
+        sessionStorage.setItem('user', JSON.stringify(localUser));
         if (data.session?.access_token) {
-            localStorage.setItem('accessToken', data.session.access_token);
+            sessionStorage.setItem('accessToken', data.session.access_token);
         } else {
-            localStorage.removeItem('accessToken');
+            sessionStorage.removeItem('accessToken');
         }
 
         if (localUser.role === 'admin') {
@@ -345,10 +360,10 @@ async function validateRegisterForm(event) {
         if (data.session?.user) {
             const profile = await fetchUserProfile(data.session.user.id);
             const localUser = buildLocalUser(data.session.user, profile, fullname);
-            localStorage.setItem('user', JSON.stringify(localUser));
+            sessionStorage.setItem('user', JSON.stringify(localUser));
 
             if (data.session.access_token) {
-                localStorage.setItem('accessToken', data.session.access_token);
+                sessionStorage.setItem('accessToken', data.session.access_token);
             }
 
             window.location.href = '/pages/curso_dashboard.html';

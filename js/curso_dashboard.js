@@ -6,7 +6,14 @@
 const SUPABASE_URL = 'https://mfhfeytlgmkxuzlclawx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_TBRrwMbabN6X0NcO5656ew_imJDTeaj';
 const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+        storage: window.sessionStorage,
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+    },
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
@@ -17,8 +24,27 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================================
 
 function initializeDashboard() {
-    // Get user data from localStorage
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    // Get user data from sessionStorage
+    const userJson = sessionStorage.getItem('user');
+    if (!userJson) {
+        window.location.href = '/pages/login.html';
+        return;
+    }
+
+    let user = {};
+    try {
+        user = JSON.parse(userJson);
+    } catch (error) {
+        console.warn('Sesión de usuario inválida:', error.message);
+    }
+
+    if (!user.id) {
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('accessToken');
+        window.location.href = '/pages/login.html';
+        return;
+    }
+
     if (user.name) {
         const welcomeUsername = document.getElementById('welcomeUsername');
         if (welcomeUsername) {
@@ -159,7 +185,7 @@ function updatePageTitle(section) {
 
 async function loadProfileFromSupabase() {
     try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const user = JSON.parse(sessionStorage.getItem('user') || '{}');
         if (!user.id) {
             console.log('⚠️ No user ID found');
             return;
@@ -216,11 +242,24 @@ function initializeLogout() {
     });
 }
 
-function logout() {
-    // Clear localStorage
+async function logout() {
+    try {
+        await supabaseClient.auth.signOut();
+    } catch (error) {
+        console.warn('No se pudo cerrar sesión en Supabase:', error.message);
+    }
+
+    // Clear session auth data
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('videoTime');
+
+    // Remove legacy persisted auth keys
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
-    localStorage.removeItem('videoTime');
+    localStorage.removeItem('sb-mfhfeytlgmkxuzlclawx-auth-token');
+
+    // Keep preferences cleanup behavior
     localStorage.removeItem('sidebarCollapsed');
     localStorage.removeItem('lastSection');
 
@@ -326,7 +365,7 @@ document.addEventListener('click', function(e) {
 // ========================================
 
 function checkAuthentication() {
-    const token = localStorage.getItem('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (!token) {
         // Redirect to login if not authenticated
         window.location.href = '/pages/login.html';

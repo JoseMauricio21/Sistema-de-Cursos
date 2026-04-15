@@ -6,7 +6,14 @@ const SUPABASE_URL = 'https://mfhfeytlgmkxuzlclawx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_TBRrwMbabN6X0NcO5656ew_imJDTeaj';
 
 const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+        storage: window.sessionStorage,
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+    },
+});
 
 // ========================================
 // DOM ELEMENTS
@@ -39,8 +46,8 @@ let currentProfile = null;
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📄 Profile page loaded');
     
-    // Get user from localStorage
-    const userJson = localStorage.getItem('user');
+    // Get user from sessionStorage
+    const userJson = sessionStorage.getItem('user');
     if (!userJson) {
         console.log('❌ No user found, redirecting to login');
         window.location.href = '/pages/login.html';
@@ -226,6 +233,12 @@ async function handleFormSubmit(e) {
 
         // Update currentProfile
         currentProfile = result.profile;
+
+        // Keep in-memory user info aligned for this browser session.
+        const currentSessionUser = JSON.parse(sessionStorage.getItem('user') || '{}');
+        currentSessionUser.name = result.profile.full_name || currentSessionUser.name;
+        currentSessionUser.avatar_url = result.profile.avatar_url || currentSessionUser.avatar_url || null;
+        sessionStorage.setItem('user', JSON.stringify(currentSessionUser));
 
         hideLoading();
         showSuccess('Perfil actualizado correctamente');

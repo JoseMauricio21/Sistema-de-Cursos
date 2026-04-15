@@ -12,8 +12,19 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.warn('⚠️ Credenciales de Supabase no configuradas correctamente');
 }
 
+const supabaseOptions = typeof window !== 'undefined' && window.sessionStorage
+    ? {
+        auth: {
+            storage: window.sessionStorage,
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+        },
+    }
+    : {};
+
 // Crear cliente de Supabase
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, supabaseOptions);
 
 export { SUPABASE_URL, SUPABASE_ANON_KEY };
 export default supabase;
