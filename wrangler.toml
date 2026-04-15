@@ -1,6 +1,2 @@
-# Cloudflare Pages configuration
-# Este archivo le indica a Cloudflare que es un sitio estático
-
-name = "pagina-de-ingles"
-type = "javascript"
-compatibility_date = "2026-04-15"
+# Cloudflare Pages Static Site configuration
+# No especificar entry-point - esto es un sitio estático puro
