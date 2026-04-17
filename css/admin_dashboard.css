@@ -118,17 +118,37 @@ body {
 .admin-topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 12px;
 }
 
 #sectionTitle {
     color: #111111;
-    font-size: 34px;
-    letter-spacing: -0.3px;
+    font-size: clamp(20px, 2.5vw, 28px);
+    letter-spacing: -0.2px;
+    line-height: 1.15;
 }
 
-.admin-user-chip {
+.admin-welcome-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-welcome-text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#sectionWelcomeLine {
+    font-size: clamp(16px, 2.1vw, 22px);
+    line-height: 1.2;
+    color: #111111;
+    font-weight: 600;
+}
+
+.admin-profile-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -137,7 +157,70 @@ body {
     background: #ffffff;
     border: 1px solid #111111;
     border-radius: 999px;
-    padding: 8px 14px;
+    padding: 7px 12px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.admin-profile-link.icon-only {
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.admin-profile-link.icon-only:hover {
+    background: transparent;
+    transform: translateY(-1px);
+}
+
+.admin-profile-link:hover {
+    background: #f4f4f4;
+}
+
+.admin-profile-link strong {
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    position: relative;
+    overflow: hidden;
+    background: #111111;
+    flex-shrink: 0;
+}
+
+.admin-avatar::after {
+    content: attr(data-initial);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.admin-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    position: relative;
+    z-index: 1;
+}
+
+.admin-profile-link.icon-only .admin-avatar {
+    width: 58px;
+    height: 58px;
+}
+
+.admin-profile-link.icon-only .admin-avatar::after {
+    font-size: 19px;
 }
 
 .section-card {
@@ -148,10 +231,78 @@ body {
     box-shadow: none;
     padding: 0;
     overflow: visible;
+    will-change: opacity, transform;
 }
 
 .section-card.active {
     display: block;
+}
+
+.section-card.section-leave-forward,
+.section-card.section-leave-backward,
+.section-card.section-enter-forward,
+.section-card.section-enter-backward {
+    pointer-events: none;
+}
+
+.section-card.section-leave-forward {
+    animation: adminSectionOutForward 0.24s ease forwards;
+}
+
+.section-card.section-leave-backward {
+    animation: adminSectionOutBackward 0.24s ease forwards;
+}
+
+.section-card.section-enter-forward {
+    animation: adminSectionInForward 0.36s ease forwards;
+}
+
+.section-card.section-enter-backward {
+    animation: adminSectionInBackward 0.36s ease forwards;
+}
+
+@keyframes adminSectionOutForward {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+}
+
+@keyframes adminSectionInForward {
+    from {
+        opacity: 0;
+        transform: translateX(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes adminSectionOutBackward {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(14px);
+    }
+}
+
+@keyframes adminSectionInBackward {
+    from {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .card-header {
@@ -1067,6 +1218,19 @@ th {
 
     #sectionTitle {
         font-size: 28px;
+    }
+
+    #sectionWelcomeLine {
+        font-size: 16px;
+    }
+
+    .admin-profile-link.icon-only .admin-avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .admin-profile-link.icon-only .admin-avatar::after {
+        font-size: 16px;
     }
 
     .admin-main {

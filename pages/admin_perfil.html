@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil Admin - English Learning Platform</title>
+    <link rel="stylesheet" href="../css/admin_perfil.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <main class="admin-profile-shell">
+        <header class="admin-profile-header">
+            <button class="btn btn-muted" type="button" id="adminProfileBackBtn">Volver al dashboard</button>
+            <h1>Perfil del admin</h1>
+        </header>
+
+        <section class="admin-profile-card">
+            <div class="admin-profile-avatar-panel">
+                <div class="admin-profile-avatar" id="adminProfileAvatar" data-initial="A">
+                    <img id="adminProfileAvatarImage" alt="Avatar de admin" loading="lazy" referrerpolicy="no-referrer">
+                </div>
+                <p class="admin-profile-help">Puedes cambiar la foto pegando una URL de imagen.</p>
+            </div>
+
+            <form id="adminProfileForm" class="admin-profile-form" novalidate>
+                <div class="form-row">
+                    <label for="adminProfileName">Nombre completo</label>
+                    <input id="adminProfileName" type="text" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="adminProfileEmail">Correo</label>
+                    <input id="adminProfileEmail" type="email" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="adminProfilePassword">Nueva contrasena (opcional)</label>
+                    <input id="adminProfilePassword" type="password" placeholder="Dejar vacio para no cambiar">
+                </div>
+
+                <div class="form-row">
+                    <label for="adminProfilePasswordConfirm">Confirmar nueva contrasena</label>
+                    <input id="adminProfilePasswordConfirm" type="password" placeholder="Repite la contrasena">
+                </div>
+
+                <div class="form-row">
+                    <label for="adminProfileAvatarUrl">URL de imagen de perfil</label>
+                    <input id="adminProfileAvatarUrl" type="url" placeholder="https://...">
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-muted" type="button" id="adminProfileCancelBtn">Cancelar</button>
+                    <button class="btn btn-primary" type="submit" id="adminProfileSaveBtn">Guardar cambios</button>
+                </div>
+            </form>
+
+            <p id="adminProfileMessage" class="profile-message" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <script src="../js/admin_perfil.js"></script>
+</body>
+</html>

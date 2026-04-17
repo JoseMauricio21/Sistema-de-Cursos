@@ -20,8 +20,21 @@ const SECTION_TITLES = {
     createGroupSection: 'Crear grupo',
 };
 
+const ADMIN_SECTION_ORDER = [
+    'coursesSection',
+    'studentsSection',
+    'liveSection',
+    'liveCreatedSection',
+    'examsSection',
+    'groupsSection',
+    'createGroupSection',
+];
+
 const state = {
     currentAdmin: null,
+    currentSectionId: 'coursesSection',
+    adminSectionTransitionRunning: false,
+    adminSectionTransitionToken: 0,
     students: [],
     liveSelectedStudentIds: [],
     liveWizardStep: 1,
@@ -60,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function bindNavigation() {
     document.querySelectorAll('#adminNav button').forEach((button) => {
         button.addEventListener('click', () => {
-            switchSection(button.dataset.section);
+            animateSectionChange(button.dataset.section);
         });
     });
 }
@@ -74,10 +87,74 @@ function switchSection(sectionId) {
         section.classList.toggle('active', section.id === sectionId);
     });
 
-    const title = SECTION_TITLES[sectionId] || 'Admin';
-    const titleEl = document.getElementById('sectionTitle');
-    if (titleEl) {
-        titleEl.textContent = title;
+    state.currentSectionId = sectionId;
+
+    updateAdminIdentityChip();
+}
+
+function getSectionDirection(nextSectionId) {
+    const currentIndex = ADMIN_SECTION_ORDER.indexOf(state.currentSectionId);
+    const nextIndex = ADMIN_SECTION_ORDER.indexOf(nextSectionId);
+
+    if (currentIndex === -1 || nextIndex === -1 || nextIndex >= currentIndex) {
+        return 'forward';
+    }
+
+    return 'backward';
+}
+
+function waitForTransition(ms) {
+    return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+    });
+}
+
+async function animateSectionChange(nextSectionId) {
+    if (!nextSectionId || nextSectionId === state.currentSectionId || state.adminSectionTransitionRunning) {
+        return;
+    }
+
+    const currentSection = document.getElementById(state.currentSectionId);
+    const nextSection = document.getElementById(nextSectionId);
+    if (!nextSection) {
+        return;
+    }
+
+    const direction = getSectionDirection(nextSectionId);
+    state.adminSectionTransitionRunning = true;
+    state.adminSectionTransitionToken += 1;
+    const token = state.adminSectionTransitionToken;
+
+    try {
+        if (currentSection) {
+            currentSection.classList.add(
+                direction === 'backward' ? 'section-leave-backward' : 'section-leave-forward'
+            );
+
+            await waitForTransition(240);
+            if (token !== state.adminSectionTransitionToken) {
+                return;
+            }
+
+            currentSection.classList.remove('section-leave-forward', 'section-leave-backward');
+        }
+
+        switchSection(nextSectionId);
+
+        nextSection.classList.add(
+            direction === 'backward' ? 'section-enter-backward' : 'section-enter-forward'
+        );
+
+        await waitForTransition(360);
+        if (token !== state.adminSectionTransitionToken) {
+            return;
+        }
+
+        nextSection.classList.remove('section-enter-forward', 'section-enter-backward');
+    } finally {
+        if (token === state.adminSectionTransitionToken) {
+            state.adminSectionTransitionRunning = false;
+        }
     }
 }
 
@@ -111,7 +188,7 @@ async function ensureAdminAccess() {
     let resolvedProfile = {
         id: sessionUser.id,
         email: sessionUser.email || '',
-        full_name: sessionUser.name || 'Admin',
+        full_name: sessionUser.name || 'Nombre del usuario',
         username: '',
         role: sessionUser.role || 'student',
         avatar_url: sessionUser.avatar_url || null,
@@ -140,17 +217,14 @@ async function ensureAdminAccess() {
     state.currentAdmin = {
         id: resolvedProfile.id,
         email: resolvedProfile.email,
-        name: resolvedProfile.full_name || 'Admin',
+        name: resolvedProfile.full_name || 'Nombre del usuario',
         username: resolvedProfile.username || '',
         role: 'admin',
         avatar_url: resolvedProfile.avatar_url || null,
     };
 
     sessionStorage.setItem('user', JSON.stringify(state.currentAdmin));
-    const userNameEl = document.getElementById('adminUserName');
-    if (userNameEl) {
-        userNameEl.textContent = state.currentAdmin.name;
-    }
+    updateAdminIdentityChip();
 
     return true;
 }
@@ -170,6 +244,60 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+function getAdminTimeGreeting() {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) {
+        return 'Buenos dias';
+    }
+
+    if (hour >= 12 && hour < 19) {
+        return 'Buenas tardes';
+    }
+
+    return 'Buenas noches';
+}
+
+function updateAdminIdentityChip() {
+    const titleEl = document.getElementById('sectionTitle');
+    const welcomeLineEl = document.getElementById('sectionWelcomeLine');
+    const avatarEl = document.getElementById('adminUserAvatar');
+    const avatarImgEl = document.getElementById('adminUserAvatarImage');
+
+    const displayName = state.currentAdmin?.name || 'Nombre del usuario';
+    const avatarUrl = String(state.currentAdmin?.avatar_url || '').trim();
+    const initial = displayName.trim() ? displayName.trim().charAt(0).toUpperCase() : 'A';
+
+    if (titleEl) {
+        titleEl.textContent = getAdminTimeGreeting();
+    }
+
+    if (welcomeLineEl) {
+        welcomeLineEl.textContent = `Bienvenida, ${displayName}`;
+    }
+
+    if (avatarEl) {
+        avatarEl.setAttribute('data-initial', initial);
+    }
+
+    if (!avatarImgEl) {
+        return;
+    }
+
+    if (!avatarUrl) {
+        avatarImgEl.removeAttribute('src');
+        avatarImgEl.style.display = 'none';
+        return;
+    }
+
+    avatarImgEl.src = avatarUrl;
+    avatarImgEl.style.display = 'block';
+    avatarImgEl.onerror = () => {
+        avatarImgEl.removeAttribute('src');
+        avatarImgEl.style.display = 'none';
+    };
 }
 
 function showToast(message, type = 'info') {
