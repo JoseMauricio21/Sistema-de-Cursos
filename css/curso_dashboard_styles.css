@@ -1952,3 +1952,443 @@ html, body {
     opacity: 0.8;
     transform: scale(1.05);
 }
+
+/* ========================================
+   MONOCHROME THEME OVERRIDES
+   ======================================== */
+
+:root {
+    --primary-color: #111111;
+    --primary-dark: #000000;
+    --primary-light: #111111;
+    --secondary-color: #111111;
+    --warning-color: #111111;
+    --danger-color: #111111;
+    --success-color: #111111;
+    --text-dark: #111111;
+    --text-light: #303030;
+    --bg-light: #ffffff;
+    --bg-white: #ffffff;
+    --border-color: #111111;
+    --shadow: none;
+    --shadow-md: none;
+}
+
+body,
+.dashboard-container,
+.main-content,
+.page-title,
+.content-wrapper,
+.content-section {
+    background: #ffffff !important;
+    color: #111111;
+}
+
+.bg-video {
+    display: none !important;
+}
+
+.dashboard-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #111111;
+    box-shadow: none;
+}
+
+.page-title h1,
+.section-header h2,
+.section-subtitle,
+.welcome-title,
+.welcome-username,
+.header-title,
+.username {
+    color: #111111 !important;
+    text-shadow: none;
+}
+
+.radio-inputs {
+    background-color: #ffffff;
+    border: 1px solid #111111;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+.radio-inputs .radio .name {
+    color: #111111;
+}
+
+.radio-inputs .radio:hover .name {
+    background-color: #f2f2f2;
+}
+
+.radio-inputs .radio input:checked + .name {
+    background-color: #111111;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.logout-btn {
+    color: #111111 !important;
+}
+
+.logout-btn:hover {
+    color: #111111 !important;
+    opacity: 0.72;
+}
+
+.quick-access-card,
+.course-card,
+.grades-container,
+.exam-card,
+.exam-item,
+.live-class-card,
+.stat-card,
+.member-card,
+.group-conversations,
+.modal-content,
+.exam-date,
+.class-schedule {
+    background: #ffffff !important;
+    border: 1px solid #111111;
+    box-shadow: none;
+}
+
+.card-icon {
+    color: #ffffff;
+    background: #111111;
+}
+
+.course-badge,
+.live-badge,
+.conversation-avatar {
+    background: #111111 !important;
+    color: #ffffff !important;
+}
+
+.live-class-card.live {
+    border: 1px solid #111111;
+    background: #ffffff;
+}
+
+.grade-good,
+.grade-excellent {
+    background: #f2f2f2;
+    color: #111111;
+}
+
+.progress-bar {
+    background-color: #e8e8e8;
+}
+
+.progress-fill {
+    background: #111111;
+}
+
+.empty-state {
+    color: #111111;
+    background: #ffffff;
+    border: 1px dashed #111111;
+}
+
+.empty-state i,
+.empty-state p,
+.empty-state .small-text {
+    color: #111111;
+}
+
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-neutral,
+.btn-danger-solid {
+    background: #111111 !important;
+    color: #ffffff !important;
+    border: 1px solid #111111 !important;
+    box-shadow: none !important;
+}
+
+.btn:hover,
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-success:hover,
+.btn-neutral:hover,
+.btn-danger-solid:hover {
+    background: #000000 !important;
+    color: #ffffff !important;
+    transform: none;
+}
+
+.fab-add-course {
+    background: #111111;
+    color: #ffffff;
+    border: 1px solid #111111;
+    box-shadow: none;
+}
+
+.fab-add-course:hover {
+    background: #000000;
+    color: #ffffff;
+    transform: none;
+    box-shadow: none;
+}
+
+.modal-content input:focus {
+    border-color: #111111;
+    box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.14);
+}
+
+/* ========================================
+   LIVE CARDS COMPACT (EN VIVO)
+   ======================================== */
+
+.live-classes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 330px));
+    gap: 16px;
+    align-content: start;
+}
+
+.live-class-card {
+    width: 100%;
+    max-width: 330px;
+    padding: 12px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.live-class-card.live {
+    border: 1px solid #111111;
+}
+
+.live-card-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid #111111;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.live-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.live-card-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #111111;
+}
+
+.live-card-fallback i {
+    font-size: 24px;
+}
+
+.live-card-fallback span {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.live-card-media .live-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    animation: none;
+}
+
+.live-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.live-card-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.live-card-date {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #303030;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.live-card-platform {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #111111;
+    border: 1px solid #111111;
+    border-radius: 999px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+
+.live-card-body h3 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.24;
+    color: #111111;
+}
+
+.live-card-body .class-time {
+    margin: 0;
+    color: #303030;
+    font-size: 13px;
+    line-height: 1.4;
+    min-height: 36px;
+}
+
+.live-card-footer .btn {
+    width: 100%;
+}
+
+.live-card-footer .btn[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+    .live-classes-list {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .live-class-card {
+        max-width: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .live-classes-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   WELCOME BANNER TUNING
+   ======================================== */
+
+.welcome-profile-pic {
+    width: 112px !important;
+    height: 112px !important;
+    border: 2px solid #111111;
+}
+
+.welcome-title {
+    font-size: 34px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0;
+    text-transform: none;
+    line-height: 1.2;
+}
+
+.welcome-username {
+    font-size: 13px !important;
+    font-weight: 400;
+}
+
+@media (max-width: 768px) {
+    .welcome-profile-pic {
+        width: 96px !important;
+        height: 96px !important;
+    }
+
+    .welcome-title {
+        font-size: 30px !important;
+    }
+
+    .welcome-username {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-profile-pic {
+        width: 84px !important;
+        height: 84px !important;
+    }
+
+    .welcome-title {
+        font-size: 26px !important;
+    }
+}
+
+/* ========================================
+   LOGOUT DIALOG TEXT-ONLY OVERRIDES
+   ======================================== */
+
+.header-right .logout-btn {
+    position: static;
+    transform: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #111111;
+    background: #111111 !important;
+    color: #ffffff !important;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.header-right .logout-btn:hover {
+    background: #000000 !important;
+    color: #ffffff !important;
+    opacity: 1;
+}
+
+.logout-modal {
+    background: #ffffff !important;
+    border: 1px solid #111111;
+    box-shadow: none;
+    padding-top: 48px;
+}
+
+.logout-modal-icon {
+    display: none !important;
+}
+
+#logoutModalClose.modal-close {
+    width: auto;
+    height: auto;
+    top: 14px;
+    right: 14px;
+    border: 1px solid #111111;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #111111;
+    background: #ffffff;
+}
+
+#logoutModalClose.modal-close:hover {
+    color: #111111;
+    background: #f3f3f3;
+    transform: none;
+}
+
+.logout-modal #logoutModalTitle,
+.logout-modal .logout-modal-subtitle {
+    color: #111111;
+}

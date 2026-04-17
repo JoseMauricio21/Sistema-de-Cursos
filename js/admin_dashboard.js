@@ -12,9 +12,9 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, 
 
 const SECTION_TITLES = {
     coursesSection: 'Cursos',
-    createCourseSection: 'Crear curso',
     studentsSection: 'Alumnos',
     liveSection: 'Hacer live',
+    liveCreatedSection: 'Lives creados',
     examsSection: 'Examenes',
     groupsSection: 'Mis grupos',
     createGroupSection: 'Crear grupo',
@@ -23,6 +23,14 @@ const SECTION_TITLES = {
 const state = {
     currentAdmin: null,
     students: [],
+    liveSelectedStudentIds: [],
+    liveWizardStep: 1,
+    liveWizardTransitionRunning: false,
+    liveIntroAnimation: null,
+    liveDetailsAnimation: null,
+    liveDateOptions: [],
+    liveSelectedDate: '',
+    liveSelectedTime: '',
     courses: [],
     groups: [],
     lessonBlocksBuffer: [],
@@ -212,6 +220,24 @@ function normalizeYoutubeUrl(rawUrl) {
     return '';
 }
 
+function normalizeLiveSessionUrl(rawUrl) {
+    const value = String(rawUrl || '').trim();
+    if (!value) {
+        return '';
+    }
+
+    try {
+        const parsed = new URL(value);
+        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+            return '';
+        }
+
+        return parsed.toString();
+    } catch (error) {
+        return '';
+    }
+}
+
 function getSelectedValues(selectId) {
     const selectEl = document.getElementById(selectId);
     if (!selectEl) {
@@ -224,7 +250,6 @@ function getSelectedValues(selectId) {
 function populateStudentSelectors() {
     const selectors = [
         'courseAssignedStudents',
-        'liveTargetStudents',
         'examTargetStudents',
         'groupStudentMembers',
     ];
@@ -244,6 +269,9 @@ function populateStudentSelectors() {
             .map((student) => `<option value="${student.id}">${escapeHtml(student.full_name || 'Alumno')} (${escapeHtml(student.username || student.email)})</option>`)
             .join('');
     });
+
+    syncLiveTargetStudentsSelect();
+    renderLiveStudentsTable();
 }
 
 function populateCourseSelectorForGroups() {
@@ -287,7 +315,12 @@ async function loadStudents() {
     }
 
     if (error) {
-        renderEmpty('studentsTableBody', 'No se pudieron cargar alumnos: ' + error.message);
+        const tbody = document.getElementById('studentsTableBody');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="6">No se pudieron cargar alumnos: ${escapeHtml(error.message)}</td></tr>`;
+        }
+
+        updateStudentsResultCounter(0, 0, false);
         showToast('Error cargando alumnos: ' + error.message, 'error');
         return;
     }
@@ -301,24 +334,82 @@ async function loadStudents() {
     populateStudentSelectors();
 }
 
+function getStudentsSearchQuery() {
+    const input = document.getElementById('studentsSearchInput');
+    return input ? input.value.trim().toLowerCase() : '';
+}
+
+function getStudentDisplayName(student) {
+    return student.full_name || student.username || student.email || 'Alumno';
+}
+
+function buildStudentAvatarMarkup(student) {
+    const initialSource = getStudentDisplayName(student).trim();
+    const initial = initialSource ? initialSource.charAt(0).toUpperCase() : 'A';
+    const avatarImage = student.avatar_url
+        ? `<img src="${escapeHtml(student.avatar_url)}" alt="Foto de ${escapeHtml(getStudentDisplayName(student))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`
+        : '';
+
+    return `<div class="student-avatar" data-initial="${escapeHtml(initial)}">${avatarImage}</div>`;
+}
+
+function updateStudentsResultCounter(visibleCount, totalCount, isFiltered) {
+    const resultCounter = document.getElementById('studentsResultCount');
+    if (!resultCounter) {
+        return;
+    }
+
+    resultCounter.textContent = isFiltered
+        ? `${visibleCount} de ${totalCount} alumnos`
+        : `${totalCount} alumnos`;
+}
+
 function renderStudentsTable() {
     const tbody = document.getElementById('studentsTableBody');
     if (!tbody) {
         return;
     }
 
+    const query = getStudentsSearchQuery();
+    const filteredStudents = query
+        ? state.students.filter((student) => {
+            const searchIndex = [
+                student.full_name || '',
+                student.username || '',
+                student.email || '',
+            ]
+                .join(' ')
+                .toLowerCase();
+
+            return searchIndex.includes(query);
+        })
+        : state.students;
+
+    updateStudentsResultCounter(filteredStudents.length, state.students.length, Boolean(query));
+
     if (!state.students.length) {
-        tbody.innerHTML = '<tr><td colspan="5">No hay alumnos registrados.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6">No hay alumnos registrados.</td></tr>';
         return;
     }
 
-    tbody.innerHTML = state.students
+    if (!filteredStudents.length) {
+        tbody.innerHTML = '<tr><td colspan="6">No se encontraron alumnos con ese criterio de busqueda.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filteredStudents
         .map((student) => `
             <tr>
-                <td>${escapeHtml(student.full_name || 'Sin nombre')}</td>
+                <td class="student-avatar-cell">${buildStudentAvatarMarkup(student)}</td>
+                <td>
+                    <div class="student-name-cell">
+                        <strong>${escapeHtml(getStudentDisplayName(student))}</strong>
+                        <span class="inline-help">Registrado: ${student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</span>
+                    </div>
+                </td>
                 <td>${escapeHtml(student.username || '-')}</td>
                 <td>${escapeHtml(student.email || '-')}</td>
-                <td>${escapeHtml(student.role || 'student')}</td>
+                <td><span class="student-role-pill">${escapeHtml(student.role || 'student')}</span></td>
                 <td>
                     <button class="btn btn-secondary" data-edit-student="${student.id}">Editar</button>
                 </td>
@@ -331,6 +422,11 @@ function bindStudentsEvents() {
     const refreshBtn = document.getElementById('refreshStudentsBtn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', loadStudents);
+    }
+
+    const searchInput = document.getElementById('studentsSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', renderStudentsTable);
     }
 
     const tbody = document.getElementById('studentsTableBody');
@@ -834,25 +930,805 @@ function bindLiveEvents() {
     if (form) {
         form.addEventListener('submit', createLiveEvent);
     }
+
+    const step1NextBtn = document.getElementById('liveWizardStep1Next');
+    if (step1NextBtn) {
+        step1NextBtn.addEventListener('click', () => {
+            animateLiveWizardStepChange(2);
+        });
+    }
+
+    const step2BackBtn = document.getElementById('liveWizardStep2Back');
+    if (step2BackBtn) {
+        step2BackBtn.addEventListener('click', () => {
+            animateLiveWizardStepChange(1);
+        });
+    }
+
+    const step2NextBtn = document.getElementById('liveWizardStep2Next');
+    if (step2NextBtn) {
+        step2NextBtn.addEventListener('click', () => {
+            if (!validateLiveWizardStep2()) {
+                return;
+            }
+
+            animateLiveWizardStepChange(3);
+        });
+    }
+
+    const step3BackBtn = document.getElementById('liveWizardStep3Back');
+    if (step3BackBtn) {
+        step3BackBtn.addEventListener('click', () => {
+            animateLiveWizardStepChange(2);
+        });
+    }
+
+    const step3NextBtn = document.getElementById('liveWizardStep3Next');
+    if (step3NextBtn) {
+        step3NextBtn.addEventListener('click', () => {
+            animateLiveWizardStepChange(4);
+        });
+    }
+
+    const step4BackBtn = document.getElementById('liveWizardStep4Back');
+    if (step4BackBtn) {
+        step4BackBtn.addEventListener('click', () => {
+            animateLiveWizardStepChange(3);
+        });
+    }
+
+    const step4NextBtn = document.getElementById('liveWizardStep4Next');
+    if (step4NextBtn) {
+        step4NextBtn.addEventListener('click', () => {
+            updateLiveReviewSummary();
+            animateLiveWizardStepChange(5);
+        });
+    }
+
+    const step5BackBtn = document.getElementById('liveWizardStep5Back');
+    if (step5BackBtn) {
+        step5BackBtn.addEventListener('click', () => {
+            animateLiveWizardStepChange(4);
+        });
+    }
+
+    const timeInput = document.getElementById('liveTimeInput');
+    if (timeInput) {
+        timeInput.addEventListener('input', handleLiveTimeInputChange);
+        timeInput.addEventListener('change', handleLiveTimeInputChange);
+    }
+
+    const clearDateTimeBtn = document.getElementById('liveClearDateTimeBtn');
+    if (clearDateTimeBtn) {
+        clearDateTimeBtn.addEventListener('click', clearLiveDateTimeSelection);
+    }
+
+    const searchInput = document.getElementById('liveStudentsSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', renderLiveStudentsTable);
+    }
+
+    const selectVisibleBtn = document.getElementById('liveSelectVisibleBtn');
+    if (selectVisibleBtn) {
+        selectVisibleBtn.addEventListener('click', selectVisibleLiveStudents);
+    }
+
+    const deselectVisibleBtn = document.getElementById('liveDeselectVisibleBtn');
+    if (deselectVisibleBtn) {
+        deselectVisibleBtn.addEventListener('click', deselectVisibleLiveStudents);
+    }
+
+    const forAllCheckbox = document.getElementById('liveForAll');
+    if (forAllCheckbox) {
+        forAllCheckbox.addEventListener('change', updateLiveSelectorInteractivity);
+    }
+
+    const studentsTableBody = document.getElementById('liveStudentsTableBody');
+    if (studentsTableBody) {
+        studentsTableBody.addEventListener('click', (event) => {
+            const clickTarget = event.target;
+            if (!(clickTarget instanceof Element) || isLiveSelectorDisabled()) {
+                return;
+            }
+
+            const row = clickTarget.closest('tr[data-live-student-id]');
+            if (!row) {
+                return;
+            }
+
+            const studentId = row.getAttribute('data-live-student-id');
+            if (!studentId) {
+                return;
+            }
+
+            const checkbox = clickTarget.closest('.live-select-checkbox');
+            if (checkbox instanceof HTMLInputElement) {
+                toggleLiveStudentSelection(studentId, checkbox.checked);
+                return;
+            }
+
+            toggleLiveStudentSelection(studentId);
+        });
+    }
+
+    const liveList = document.getElementById('liveEventsList');
+    if (liveList) {
+        liveList.addEventListener('click', (event) => {
+            const clickTarget = event.target;
+            if (!(clickTarget instanceof Element)) {
+                return;
+            }
+
+            const deleteButton = clickTarget.closest('[data-delete-live]');
+            if (!deleteButton) {
+                return;
+            }
+
+            deleteLiveEvent(deleteButton.getAttribute('data-delete-live'));
+        });
+    }
+
+    const refreshLiveEventsBtn = document.getElementById('refreshLiveEventsBtn');
+    if (refreshLiveEventsBtn) {
+        refreshLiveEventsBtn.addEventListener('click', loadLiveEvents);
+    }
+
+    updateLiveSelectorInteractivity();
+    initLiveDateTimePicker(true);
+    updateLiveReviewSummary();
+    setLiveWizardStep(1);
+    initLiveWizardIntroAnimation();
+}
+
+function padLiveDateTime(value) {
+    return String(value).padStart(2, '0');
+}
+
+function formatLiveDateISO(date) {
+    return `${date.getFullYear()}-${padLiveDateTime(date.getMonth() + 1)}-${padLiveDateTime(date.getDate())}`;
+}
+
+function getRoundedCurrentTime() {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    const step = 5;
+    const roundedMinutes = Math.ceil(now.getMinutes() / step) * step;
+
+    if (roundedMinutes >= 60) {
+        now.setHours(now.getHours() + 1);
+        now.setMinutes(0, 0, 0);
+    } else {
+        now.setMinutes(roundedMinutes, 0, 0);
+    }
+
+    return `${padLiveDateTime(now.getHours())}:${padLiveDateTime(now.getMinutes())}`;
+}
+
+function buildLiveDateOptions() {
+    const options = [];
+    const baseDate = new Date();
+    baseDate.setHours(0, 0, 0, 0);
+
+    for (let index = 0; index < 7; index += 1) {
+        const date = new Date(baseDate);
+        date.setDate(baseDate.getDate() + index);
+
+        options.push({
+            value: formatLiveDateISO(date),
+            weekdayShort: date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+            dayNumber: date.getDate(),
+        });
+    }
+
+    return options;
+}
+
+function initLiveDateTimePicker(forceReset = false) {
+    const dateCardsContainer = document.getElementById('liveDateCards');
+    const timeInput = document.getElementById('liveTimeInput');
+    if (!dateCardsContainer || !timeInput) {
+        return;
+    }
+
+    state.liveDateOptions = buildLiveDateOptions();
+    const validDates = new Set(state.liveDateOptions.map((option) => option.value));
+
+    if (forceReset || !state.liveSelectedDate || !validDates.has(state.liveSelectedDate)) {
+        state.liveSelectedDate = state.liveDateOptions.length ? state.liveDateOptions[0].value : '';
+    }
+
+    if (forceReset || !state.liveSelectedTime) {
+        state.liveSelectedTime = getRoundedCurrentTime();
+    }
+
+    timeInput.value = state.liveSelectedTime;
+    renderLiveDateCards();
+    syncLiveStartDateTimeValue();
+}
+
+function renderLiveDateCards() {
+    const dateCardsContainer = document.getElementById('liveDateCards');
+    if (!dateCardsContainer) {
+        return;
+    }
+
+    if (!state.liveDateOptions.length) {
+        dateCardsContainer.innerHTML = '<div class="empty-box">No hay fechas disponibles.</div>';
+        updateLiveDateHeading();
+        updateLiveClockVisual();
+        return;
+    }
+
+    dateCardsContainer.innerHTML = state.liveDateOptions
+        .map((option) => {
+            const isSelected = option.value === state.liveSelectedDate;
+            return `
+                <button class="live-date-card ${isSelected ? 'active' : ''}" type="button" data-live-date="${option.value}">
+                    <span class="live-date-card-weekday">${escapeHtml(option.weekdayShort)}</span>
+                    <span class="live-date-card-day">${escapeHtml(option.dayNumber)}</span>
+                </button>
+            `;
+        })
+        .join('');
+
+    dateCardsContainer.querySelectorAll('[data-live-date]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const dateValue = button.getAttribute('data-live-date');
+            if (!dateValue) {
+                return;
+            }
+
+            state.liveSelectedDate = dateValue;
+            renderLiveDateCards();
+            syncLiveStartDateTimeValue();
+        });
+    });
+
+    updateLiveDateHeading();
+    updateLiveClockVisual();
+}
+
+function updateLiveDateHeading() {
+    const heading = document.getElementById('liveDateDisplayHeading');
+    if (!heading) {
+        return;
+    }
+
+    if (!state.liveSelectedDate) {
+        heading.textContent = 'Sin fecha seleccionada';
+        return;
+    }
+
+    const selectedDate = new Date(`${state.liveSelectedDate}T00:00:00`);
+    const formatted = new Intl.DateTimeFormat('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+    }).format(selectedDate);
+
+    heading.textContent = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
+function updateLiveClockVisual() {
+    const digital = document.getElementById('liveClockDigital');
+    const hourHand = document.getElementById('liveClockHourHand');
+    const minuteHand = document.getElementById('liveClockMinuteHand');
+    if (!digital || !hourHand || !minuteHand) {
+        return;
+    }
+
+    if (!state.liveSelectedTime) {
+        digital.textContent = '--:--';
+        hourHand.style.transform = 'translateX(-50%) rotate(0deg)';
+        minuteHand.style.transform = 'translateX(-50%) rotate(0deg)';
+        return;
+    }
+
+    const [hoursRaw, minutesRaw] = state.liveSelectedTime.split(':');
+    const hours = Number(hoursRaw);
+    const minutes = Number(minutesRaw);
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+        return;
+    }
+
+    const minuteDeg = minutes * 6;
+    const hourDeg = ((hours % 12) + (minutes / 60)) * 30;
+    hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+    minuteHand.style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+    digital.textContent = `${padLiveDateTime(hours)}:${padLiveDateTime(minutes)}`;
+}
+
+function handleLiveTimeInputChange(event) {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement)) {
+        return;
+    }
+
+    const nextValue = input.value.trim();
+    state.liveSelectedTime = nextValue;
+
+    if (nextValue && !state.liveSelectedDate && state.liveDateOptions.length) {
+        state.liveSelectedDate = state.liveDateOptions[0].value;
+    }
+
+    syncLiveStartDateTimeValue();
+    updateLiveClockVisual();
+}
+
+function clearLiveDateTimeSelection() {
+    state.liveSelectedDate = '';
+    state.liveSelectedTime = '';
+
+    const timeInput = document.getElementById('liveTimeInput');
+    if (timeInput) {
+        timeInput.value = '';
+    }
+
+    renderLiveDateCards();
+    syncLiveStartDateTimeValue();
+}
+
+function syncLiveStartDateTimeValue() {
+    const startsAtInput = document.getElementById('liveStartsAt');
+    if (!startsAtInput) {
+        return;
+    }
+
+    if (state.liveSelectedDate && state.liveSelectedTime) {
+        startsAtInput.value = `${state.liveSelectedDate}T${state.liveSelectedTime}`;
+    } else {
+        startsAtInput.value = '';
+    }
+
+    updateLiveReviewSummary();
+}
+
+function initLiveWizardIntroAnimation() {
+    const container = document.getElementById('liveWizardIntroAnimation');
+    if (!container || state.liveIntroAnimation) {
+        return;
+    }
+
+    if (!window.lottie || typeof window.lottie.loadAnimation !== 'function') {
+        return;
+    }
+
+    const animationPath = container.getAttribute('data-animation-path');
+    if (!animationPath) {
+        return;
+    }
+
+    state.liveIntroAnimation = window.lottie.loadAnimation({
+        container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: animationPath,
+    });
+}
+
+function initLiveWizardDetailsAnimation() {
+    const container = document.getElementById('liveWizardDetailsAnimation');
+    if (!container || state.liveDetailsAnimation) {
+        return;
+    }
+
+    if (!window.lottie || typeof window.lottie.loadAnimation !== 'function') {
+        return;
+    }
+
+    const animationPath = container.getAttribute('data-animation-path');
+    if (!animationPath) {
+        return;
+    }
+
+    state.liveDetailsAnimation = window.lottie.loadAnimation({
+        container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: animationPath,
+    });
+}
+
+function animateLiveWizardStepChange(step) {
+    const normalizedStep = Math.min(Math.max(Number(step) || 1, 1), 5);
+    if (normalizedStep === state.liveWizardStep || state.liveWizardTransitionRunning) {
+        return;
+    }
+
+    const reduceMotion = typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+        setLiveWizardStep(normalizedStep);
+        return;
+    }
+
+    const form = document.getElementById('liveForm');
+    const currentStep = state.liveWizardStep;
+    const currentSection = document.querySelector(`[data-live-step="${currentStep}"]`);
+    const leaveDuration = 460;
+    const enterDuration = 520;
+    let transitionCompleted = false;
+
+    const finishTransition = () => {
+        if (transitionCompleted) {
+            return;
+        }
+
+        transitionCompleted = true;
+        state.liveWizardTransitionRunning = false;
+        if (form) {
+            form.classList.remove('is-transitioning');
+        }
+    };
+
+    const showNextStep = () => {
+        setLiveWizardStep(normalizedStep);
+
+        const nextSection = document.querySelector(`[data-live-step="${normalizedStep}"]`);
+        if (!nextSection || typeof nextSection.animate !== 'function') {
+            finishTransition();
+            return;
+        }
+
+        const enterAnimation = nextSection.animate(
+            [
+                { opacity: 0, transform: 'translateY(14px)' },
+                { opacity: 1, transform: 'translateY(0px)' },
+            ],
+            {
+                duration: enterDuration,
+                easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                fill: 'forwards',
+            },
+        );
+
+        enterAnimation.onfinish = finishTransition;
+        enterAnimation.oncancel = finishTransition;
+    };
+
+    state.liveWizardTransitionRunning = true;
+    if (form) {
+        form.classList.add('is-transitioning');
+    }
+
+    if (!currentSection || typeof currentSection.animate !== 'function') {
+        showNextStep();
+        return;
+    }
+
+    const leaveAnimation = currentSection.animate(
+        [
+            { opacity: 1, transform: 'translateY(0px)' },
+            { opacity: 0, transform: 'translateY(14px)' },
+        ],
+        {
+            duration: leaveDuration,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            fill: 'forwards',
+        },
+    );
+
+    leaveAnimation.onfinish = showNextStep;
+    leaveAnimation.oncancel = showNextStep;
+}
+
+function setLiveWizardStep(step) {
+    const normalizedStep = Math.min(Math.max(Number(step) || 1, 1), 5);
+    state.liveWizardStep = normalizedStep;
+
+    document.querySelectorAll('[data-live-step]').forEach((section) => {
+        const sectionStep = Number(section.getAttribute('data-live-step'));
+        section.classList.toggle('active', sectionStep === normalizedStep);
+    });
+
+    document.querySelectorAll('[data-live-step-chip]').forEach((chip) => {
+        const chipStep = Number(chip.getAttribute('data-live-step-chip'));
+        chip.classList.toggle('active', chipStep === normalizedStep);
+        chip.classList.toggle('done', chipStep < normalizedStep);
+    });
+
+    if (normalizedStep === 1) {
+        initLiveWizardIntroAnimation();
+        if (state.liveIntroAnimation && typeof state.liveIntroAnimation.resize === 'function') {
+            state.liveIntroAnimation.resize();
+        }
+    }
+
+    if (normalizedStep === 2) {
+        initLiveWizardDetailsAnimation();
+        if (state.liveDetailsAnimation && typeof state.liveDetailsAnimation.resize === 'function') {
+            state.liveDetailsAnimation.resize();
+        }
+    }
+
+    if (normalizedStep === 3) {
+        renderLiveDateCards();
+    }
+
+    if (normalizedStep === 5) {
+        updateLiveReviewSummary();
+    }
+}
+
+function validateLiveWizardStep2() {
+    const title = document.getElementById('liveTitle').value.trim();
+    const sessionUrl = normalizeLiveSessionUrl(document.getElementById('liveSessionUrl').value.trim());
+
+    if (!title) {
+        showToast('El titulo del live es obligatorio.', 'warning');
+        return false;
+    }
+
+    if (!sessionUrl) {
+        showToast('Ingresa una URL valida para YouTube, Zoom, Classroom u otra reunion.', 'warning');
+        return false;
+    }
+
+    const sessionInput = document.getElementById('liveSessionUrl');
+    if (sessionInput) {
+        sessionInput.value = sessionUrl;
+    }
+
+    return true;
+}
+
+function updateLiveReviewSummary() {
+    const reviewSummary = document.getElementById('liveReviewSummary');
+    if (!reviewSummary) {
+        return;
+    }
+
+    const title = document.getElementById('liveTitle').value.trim() || 'Sin titulo';
+    const status = document.getElementById('liveStatus').value || 'draft';
+    const startsAtValue = document.getElementById('liveStartsAt').value;
+    const publishForAll = document.getElementById('liveForAll').checked;
+    const selectedStudents = publishForAll ? state.students.length : state.liveSelectedStudentIds.length;
+    const startsAtText = startsAtValue ? new Date(startsAtValue).toLocaleString() : 'Sin fecha';
+
+    reviewSummary.textContent = `Titulo: ${title} | Estado: ${status} | Inicio: ${startsAtText} | Alumnos: ${selectedStudents}`;
+}
+
+function resetLiveWizardFlow() {
+    const form = document.getElementById('liveForm');
+    if (form) {
+        form.reset();
+    }
+
+    const searchInput = document.getElementById('liveStudentsSearchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+
+    state.liveSelectedStudentIds = [];
+    state.liveSelectedDate = '';
+    state.liveSelectedTime = '';
+    syncLiveTargetStudentsSelect();
+    initLiveDateTimePicker(true);
+    updateLiveSelectorInteractivity();
+    updateLiveReviewSummary();
+    setLiveWizardStep(1);
+}
+
+function getLiveStudentsSearchQuery() {
+    const input = document.getElementById('liveStudentsSearchInput');
+    return input ? input.value.trim().toLowerCase() : '';
+}
+
+function getFilteredLiveStudents() {
+    const query = getLiveStudentsSearchQuery();
+    if (!query) {
+        return state.students;
+    }
+
+    return state.students.filter((student) => {
+        const index = [
+            student.full_name || '',
+            student.username || '',
+            student.email || '',
+        ]
+            .join(' ')
+            .toLowerCase();
+
+        return index.includes(query);
+    });
+}
+
+function isLiveSelectorDisabled() {
+    const forAllCheckbox = document.getElementById('liveForAll');
+    return Boolean(forAllCheckbox && forAllCheckbox.checked);
+}
+
+function updateLiveSelectionSummary(visibleCount, totalCount) {
+    const summary = document.getElementById('liveStudentsSelectionSummary');
+    if (!summary) {
+        return;
+    }
+
+    const selectedCount = state.liveSelectedStudentIds.length;
+    if (!totalCount) {
+        summary.textContent = '0 seleccionados';
+        return;
+    }
+
+    if (visibleCount !== totalCount) {
+        summary.textContent = `${selectedCount} seleccionados | ${visibleCount} visibles de ${totalCount}`;
+        updateLiveReviewSummary();
+        return;
+    }
+
+    summary.textContent = `${selectedCount} seleccionados de ${totalCount}`;
+    updateLiveReviewSummary();
+}
+
+function syncLiveTargetStudentsSelect() {
+    const select = document.getElementById('liveTargetStudents');
+    if (!select) {
+        return;
+    }
+
+    const validStudentIds = new Set(state.students.map((student) => student.id));
+    state.liveSelectedStudentIds = state.liveSelectedStudentIds.filter((studentId) => validStudentIds.has(studentId));
+
+    if (!state.students.length) {
+        select.innerHTML = '<option disabled>No hay alumnos disponibles</option>';
+        return;
+    }
+
+    const selectedIdSet = new Set(state.liveSelectedStudentIds);
+    select.innerHTML = state.students
+        .map((student) => {
+            const isSelected = selectedIdSet.has(student.id) ? ' selected' : '';
+            return `<option value="${student.id}"${isSelected}>${escapeHtml(student.full_name || 'Alumno')} (${escapeHtml(student.username || student.email)})</option>`;
+        })
+        .join('');
+}
+
+function renderLiveStudentsTable() {
+    const tbody = document.getElementById('liveStudentsTableBody');
+    if (!tbody) {
+        return;
+    }
+
+    const filteredStudents = getFilteredLiveStudents();
+    const selectedSet = new Set(state.liveSelectedStudentIds);
+    const disabled = isLiveSelectorDisabled();
+
+    updateLiveSelectionSummary(filteredStudents.length, state.students.length);
+
+    if (!state.students.length) {
+        tbody.innerHTML = '<tr><td colspan="5">No hay alumnos disponibles.</td></tr>';
+        return;
+    }
+
+    if (!filteredStudents.length) {
+        tbody.innerHTML = '<tr><td colspan="5">No hay coincidencias con tu busqueda.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filteredStudents
+        .map((student) => {
+            const isSelected = selectedSet.has(student.id);
+            return `
+                <tr class="live-student-row ${isSelected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" data-live-student-id="${student.id}">
+                    <td class="live-select-cell">
+                        <input class="live-select-checkbox" type="checkbox" data-live-student-id="${student.id}" ${isSelected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+                    </td>
+                    <td class="student-avatar-cell">${buildStudentAvatarMarkup(student)}</td>
+                    <td>
+                        <div class="student-name-cell">
+                            <strong>${escapeHtml(getStudentDisplayName(student))}</strong>
+                            <span class="inline-help">Click para seleccionar o deseleccionar</span>
+                        </div>
+                    </td>
+                    <td>${escapeHtml(student.username || '-')}</td>
+                    <td>${escapeHtml(student.email || '-')}</td>
+                </tr>
+            `;
+        })
+        .join('');
+}
+
+function updateLiveSelectorInteractivity() {
+    const disabled = isLiveSelectorDisabled();
+    const searchInput = document.getElementById('liveStudentsSearchInput');
+    const selectVisibleBtn = document.getElementById('liveSelectVisibleBtn');
+    const deselectVisibleBtn = document.getElementById('liveDeselectVisibleBtn');
+    const tableWrap = document.querySelector('.live-students-table-wrap');
+
+    if (searchInput) {
+        searchInput.disabled = disabled;
+    }
+
+    if (selectVisibleBtn) {
+        selectVisibleBtn.disabled = disabled;
+    }
+
+    if (deselectVisibleBtn) {
+        deselectVisibleBtn.disabled = disabled;
+    }
+
+    if (tableWrap) {
+        tableWrap.classList.toggle('disabled', disabled);
+    }
+
+    renderLiveStudentsTable();
+    updateLiveReviewSummary();
+}
+
+function toggleLiveStudentSelection(studentId, forceSelected = null) {
+    if (!studentId) {
+        return;
+    }
+
+    const selectedSet = new Set(state.liveSelectedStudentIds);
+    const shouldSelect = forceSelected === null ? !selectedSet.has(studentId) : Boolean(forceSelected);
+
+    if (shouldSelect) {
+        selectedSet.add(studentId);
+    } else {
+        selectedSet.delete(studentId);
+    }
+
+    state.liveSelectedStudentIds = Array.from(selectedSet);
+    syncLiveTargetStudentsSelect();
+    renderLiveStudentsTable();
+}
+
+function selectVisibleLiveStudents() {
+    if (isLiveSelectorDisabled()) {
+        return;
+    }
+
+    const selectedSet = new Set(state.liveSelectedStudentIds);
+    getFilteredLiveStudents().forEach((student) => {
+        selectedSet.add(student.id);
+    });
+
+    state.liveSelectedStudentIds = Array.from(selectedSet);
+    syncLiveTargetStudentsSelect();
+    renderLiveStudentsTable();
+}
+
+function deselectVisibleLiveStudents() {
+    if (isLiveSelectorDisabled()) {
+        return;
+    }
+
+    const visibleIds = new Set(getFilteredLiveStudents().map((student) => student.id));
+    state.liveSelectedStudentIds = state.liveSelectedStudentIds.filter((studentId) => !visibleIds.has(studentId));
+    syncLiveTargetStudentsSelect();
+    renderLiveStudentsTable();
 }
 
 async function createLiveEvent(event) {
     event.preventDefault();
 
+    if (state.liveWizardStep !== 5) {
+        showToast('Completa el flujo hasta la ventana final para publicar el live.', 'info');
+        return;
+    }
+
+    if (!validateLiveWizardStep2()) {
+        setLiveWizardStep(2);
+        return;
+    }
+
     const title = document.getElementById('liveTitle').value.trim();
     const description = document.getElementById('liveDescription').value.trim();
-    const youtubeUrl = normalizeYoutubeUrl(document.getElementById('liveYoutubeUrl').value.trim());
+    const sessionUrl = normalizeLiveSessionUrl(document.getElementById('liveSessionUrl').value.trim());
     const status = document.getElementById('liveStatus').value;
     const startsAtValue = document.getElementById('liveStartsAt').value;
     const publishForAll = document.getElementById('liveForAll').checked;
 
     let studentIds = getSelectedValues('liveTargetStudents');
-    if (publishForAll || (status === 'published' && !studentIds.length)) {
+    if (publishForAll) {
         studentIds = state.students.map((student) => student.id);
     }
 
-    if (!title || !youtubeUrl) {
-        showToast('Completa titulo y URL valida de YouTube.', 'warning');
+    if (!title || !sessionUrl) {
+        showToast('Completa titulo y un enlace valido (YouTube, Zoom, Classroom, etc.).', 'warning');
         return;
     }
 
@@ -867,7 +1743,7 @@ async function createLiveEvent(event) {
             created_by: state.currentAdmin.id,
             title,
             description: description || null,
-            youtube_url: youtubeUrl,
+            youtube_url: sessionUrl,
             starts_at: startsAtValue ? new Date(startsAtValue).toISOString() : null,
             status,
         })
@@ -901,13 +1777,37 @@ async function createLiveEvent(event) {
         }
     }
 
-    document.getElementById('liveForm').reset();
+    resetLiveWizardFlow();
     await loadLiveEvents();
     if (status === 'published') {
         showToast(`Live publicado correctamente para ${studentIds.length} alumno(s).`, 'success');
     } else {
         showToast('Live creado correctamente en borrador.', 'success');
     }
+}
+
+async function deleteLiveEvent(liveId) {
+    if (!liveId) {
+        return;
+    }
+
+    const confirmed = window.confirm('Seguro que quieres eliminar este live? Esta accion no se puede deshacer.');
+    if (!confirmed) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from('live_events')
+        .delete()
+        .eq('id', liveId);
+
+    if (error) {
+        showToast('No se pudo eliminar live: ' + error.message, 'error');
+        return;
+    }
+
+    await loadLiveEvents();
+    showToast('Live eliminado correctamente.', 'success');
 }
 
 async function loadLiveEvents() {
@@ -956,7 +1856,10 @@ async function loadLiveEvents() {
                     </div>
                     <p class="inline-help">Alumnos asignados: ${assigned}</p>
                     <p class="inline-help">Inicio: ${live.starts_at ? new Date(live.starts_at).toLocaleString() : 'Sin fecha'}</p>
-                    <a href="${escapeHtml(live.youtube_url)}" target="_blank" rel="noopener" class="inline-help">Abrir YouTube</a>
+                    <div class="actions-row">
+                        <a href="${escapeHtml(live.youtube_url)}" target="_blank" rel="noopener" class="btn btn-secondary">Abrir enlace</a>
+                        <button class="btn btn-danger" type="button" data-delete-live="${escapeHtml(live.id)}">Eliminar live</button>
+                    </div>
                 </article>
             `;
         })

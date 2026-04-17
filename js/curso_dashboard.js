@@ -259,6 +259,48 @@ function escapeHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
+function extractYouTubeVideoId(rawUrl) {
+    if (!rawUrl) {
+        return '';
+    }
+
+    try {
+        const parsed = new URL(rawUrl);
+        const hostname = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+
+        if (hostname === 'youtu.be') {
+            return (parsed.pathname.split('/').filter(Boolean)[0] || '').trim();
+        }
+
+        if (hostname === 'youtube.com' || hostname === 'm.youtube.com' || hostname.endsWith('.youtube.com')) {
+            const searchId = parsed.searchParams.get('v');
+            if (searchId) {
+                return searchId.trim();
+            }
+
+            const pathParts = parsed.pathname.split('/').filter(Boolean);
+            const markerIndex = pathParts.findIndex((part) => ['embed', 'shorts', 'live', 'v'].includes(part.toLowerCase()));
+            if (markerIndex >= 0 && pathParts[markerIndex + 1]) {
+                return pathParts[markerIndex + 1].trim();
+            }
+        }
+    } catch (error) {
+        // Ignore parse errors and use regex fallback.
+    }
+
+    const match = String(rawUrl).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{6,})/i);
+    return match ? match[1] : '';
+}
+
+function buildYouTubeThumbnailUrl(rawUrl) {
+    const videoId = extractYouTubeVideoId(rawUrl);
+    if (!videoId) {
+        return '';
+    }
+
+    return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;
+}
+
 function renderStudentEmpty(target, iconClass, title, subtitle) {
     if (!target) {
         return;
@@ -469,21 +511,41 @@ async function loadAssignedLives() {
             const dateText = liveDate
                 ? liveDate.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' })
                 : 'Sin fecha';
+            const liveUrl = String(live.youtube_url || '').trim();
+            const youtubeThumb = buildYouTubeThumbnailUrl(liveUrl);
+            const platformLabel = youtubeThumb ? 'YouTube' : 'Enlace online';
+            const description = String(live.description || 'Live asignado por tu admin');
+            const shortDescription = description.length > 130
+                ? `${description.slice(0, 127)}...`
+                : description;
+            const actionLabel = liveUrl ? 'Unirme ahora' : 'Sin enlace';
 
             return `
                 <article class="live-class-card live">
-                    <div class="live-indicator">
+                    <div class="live-card-media ${youtubeThumb ? 'has-preview' : 'no-preview'}">
+                        ${youtubeThumb
+                            ? `<img src="${escapeHtml(youtubeThumb)}" alt="Caratula de ${escapeHtml(live.title)}" loading="lazy" referrerpolicy="no-referrer">`
+                            : `
+                                <div class="live-card-fallback">
+                                    <i class="fas fa-video"></i>
+                                    <span>Sin preview</span>
+                                </div>
+                            `
+                        }
                         <span class="live-badge">LIVE</span>
                     </div>
-                    <div class="class-schedule">
-                        <span class="time">${escapeHtml(timeText)}</span>
-                        <span class="date">${escapeHtml(dateText)}</span>
-                    </div>
-                    <div class="class-info">
+
+                    <div class="live-card-body">
+                        <div class="live-card-topline">
+                            <p class="live-card-date"><i class="fas fa-calendar-alt" aria-hidden="true"></i> ${escapeHtml(dateText)} - ${escapeHtml(timeText)}</p>
+                            <p class="live-card-platform">${escapeHtml(platformLabel)}</p>
+                        </div>
                         <h3>${escapeHtml(live.title)}</h3>
-                        <p class="class-time">${escapeHtml(live.description || 'Live asignado por tu admin')}</p>
+                        <p class="class-time">${escapeHtml(shortDescription)}</p>
+                        <div class="live-card-footer">
+                            <button class="btn btn-primary btn-small" data-live-url="${escapeHtml(liveUrl)}" ${liveUrl ? '' : 'disabled'}>${actionLabel}</button>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" data-live-url="${escapeHtml(live.youtube_url)}">Unirme ahora</button>
                 </article>
             `;
         })
@@ -641,9 +703,18 @@ window.addEventListener('load', function() {
 
 // Add event listeners for buttons in courses
 document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('btn')) {
+    const clickedButton = e.target.closest('.btn');
+    if (!clickedButton) {
+        return;
+    }
+
+    if (clickedButton.hasAttribute('data-live-url')) {
+        return;
+    }
+
+    if (clickedButton.classList.contains('btn')) {
         // Handle button click based on button type
-        const buttonText = e.target.textContent.trim();
+        const buttonText = clickedButton.textContent.trim();
 
         if (buttonText === 'Continuar' || buttonText === 'Empezar') {
             // Redirect to course

@@ -17,9 +17,9 @@
 
             <nav class="side-nav" id="adminNav">
                 <button class="active" data-section="coursesSection">Cursos</button>
-                <button data-section="createCourseSection">Crear curso</button>
                 <button data-section="studentsSection">Alumnos</button>
                 <button data-section="liveSection">Hacer live</button>
+                <button data-section="liveCreatedSection">Lives creados</button>
                 <button data-section="examsSection">Examenes</button>
                 <button data-section="groupsSection">Mis grupos</button>
                 <button data-section="createGroupSection">Crear grupo</button>
@@ -50,122 +50,6 @@
                 <div class="list-board" id="coursesList"></div>
             </section>
 
-            <section class="section-card" id="createCourseSection">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">Crear nuevo curso</h2>
-                        <p class="card-subtitle">Constructor con lecciones, bloques multimedia y preguntas tipo forms</p>
-                    </div>
-                </div>
-
-                <form id="createCourseForm" class="stack">
-                    <div class="grid-2">
-                        <div class="stack">
-                            <label for="courseTitle">Titulo del curso</label>
-                            <input id="courseTitle" type="text" required placeholder="Ej. Ingles A1 Intensivo">
-                        </div>
-                        <div class="stack">
-                            <label for="courseCover">Imagen de portada (URL)</label>
-                            <input id="courseCover" type="url" placeholder="https://...">
-                        </div>
-                    </div>
-
-                    <div class="grid-2">
-                        <div class="stack">
-                            <label for="courseStatus">Estado</label>
-                            <select id="courseStatus">
-                                <option value="draft">Borrador</option>
-                                <option value="published">Publicado</option>
-                            </select>
-                        </div>
-                        <div class="stack">
-                            <label for="courseAssignedStudents">Asignar alumnos</label>
-                            <select id="courseAssignedStudents" multiple></select>
-                            <label class="inline-help"><input id="courseAssignAll" type="checkbox"> Asignar a todos los alumnos</label>
-                        </div>
-                    </div>
-
-                    <div class="stack">
-                        <label for="courseDescription">Descripcion</label>
-                        <textarea id="courseDescription" placeholder="Descripcion general del curso"></textarea>
-                    </div>
-
-                    <div class="mini-card stack">
-                        <h3>Compositor de leccion</h3>
-
-                        <div class="grid-2">
-                            <div class="stack">
-                                <label for="lessonTitle">Titulo de la leccion</label>
-                                <input id="lessonTitle" type="text" placeholder="Ej. Present simple">
-                            </div>
-                            <div class="stack">
-                                <label for="lessonDescription">Descripcion de la leccion</label>
-                                <input id="lessonDescription" type="text" placeholder="Objetivos de esta leccion">
-                            </div>
-                        </div>
-
-                        <div class="grid-3">
-                            <div class="stack">
-                                <label for="lessonBlockType">Tipo de bloque</label>
-                                <select id="lessonBlockType">
-                                    <option value="text">Texto</option>
-                                    <option value="image">Imagen</option>
-                                    <option value="youtube">Video de YouTube</option>
-                                </select>
-                            </div>
-                            <div class="stack">
-                                <label for="lessonBlockUrl">URL (imagen o video)</label>
-                                <input id="lessonBlockUrl" type="url" placeholder="https://...">
-                            </div>
-                            <div class="stack">
-                                <label for="lessonBlockText">Texto del bloque</label>
-                                <input id="lessonBlockText" type="text" placeholder="Contenido para este bloque">
-                            </div>
-                        </div>
-
-                        <div class="actions-row">
-                            <button class="btn btn-secondary" type="button" id="addLessonBlockBtn">Agregar bloque</button>
-                        </div>
-                        <div id="lessonBlocksDraft" class="list-board"></div>
-
-                        <hr>
-
-                        <div class="grid-3">
-                            <div class="stack">
-                                <label for="lessonQuestionText">Pregunta</label>
-                                <input id="lessonQuestionText" type="text" placeholder="Escribe la pregunta">
-                            </div>
-                            <div class="stack">
-                                <label for="lessonQuestionOptions">Opciones (coma o salto de linea)</label>
-                                <input id="lessonQuestionOptions" type="text" placeholder="Opcion 1, Opcion 2, Opcion 3">
-                            </div>
-                            <div class="stack">
-                                <label for="lessonQuestionAnswer">Respuesta correcta (numero o texto)</label>
-                                <input id="lessonQuestionAnswer" type="text" placeholder="1 o texto exacto">
-                            </div>
-                        </div>
-
-                        <div class="actions-row">
-                            <button class="btn btn-secondary" type="button" id="addLessonQuestionBtn">Agregar pregunta</button>
-                        </div>
-                        <div id="lessonQuestionsDraft" class="list-board"></div>
-
-                        <div class="actions-row">
-                            <button class="btn btn-primary" type="button" id="addLessonDraftBtn">Guardar leccion en borrador del curso</button>
-                        </div>
-                    </div>
-
-                    <div class="mini-card">
-                        <h3>Lecciones en borrador para este curso</h3>
-                        <div id="lessonDraftList" class="list-board"></div>
-                    </div>
-
-                    <div class="actions-row">
-                        <button class="btn btn-primary" type="submit">Crear curso completo</button>
-                    </div>
-                </form>
-            </section>
-
             <section class="section-card" id="studentsSection">
                 <div class="card-header">
                     <div>
@@ -175,10 +59,19 @@
                     <button class="btn btn-secondary" id="refreshStudentsBtn">Actualizar</button>
                 </div>
 
+                <div class="students-toolbar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon" aria-hidden="true">&#128269;</span>
+                        <input id="studentsSearchInput" type="search" placeholder="Buscar por nombre, usuario o email">
+                    </div>
+                    <p class="inline-help" id="studentsResultCount">0 alumnos</p>
+                </div>
+
                 <div class="table-wrap">
-                    <table>
+                    <table class="students-table">
                         <thead>
                             <tr>
+                                <th>Perfil</th>
                                 <th>Nombre</th>
                                 <th>Usuario</th>
                                 <th>Email</th>
@@ -194,57 +87,171 @@
             <section class="section-card" id="liveSection">
                 <div class="card-header">
                     <div>
-                        <h2 class="card-title">Hacer live de YouTube</h2>
-                        <p class="card-subtitle">Publica un live y selecciona que alumnos lo veran en su dashboard</p>
+                        <h2 class="card-title">Crear live</h2>
+                        <p class="card-subtitle">Publica un live con enlace de YouTube, Zoom o Google Classroom y asigna alumnos</p>
                     </div>
                 </div>
 
-                <form id="liveForm" class="stack">
-                    <div class="grid-2">
-                        <div class="stack">
-                            <label for="liveTitle">Titulo del live</label>
-                            <input id="liveTitle" type="text" required>
-                        </div>
-                        <div class="stack">
-                            <label for="liveYoutubeUrl">URL de YouTube</label>
-                            <input id="liveYoutubeUrl" type="url" required placeholder="https://www.youtube.com/watch?v=...">
-                        </div>
-                    </div>
-
-                    <div class="grid-2">
-                        <div class="stack">
-                            <label for="liveStartsAt">Fecha/Hora (opcional)</label>
-                            <input id="liveStartsAt" type="datetime-local">
-                        </div>
-                        <div class="stack">
-                            <label for="liveStatus">Estado</label>
-                            <select id="liveStatus">
-                                <option value="draft">Borrador</option>
-                                <option value="published">Publicado</option>
-                            </select>
+                <form id="liveForm" class="stack live-wizard-form">
+                    <div class="live-wizard-header">
+                        <div class="live-wizard-steps" id="liveWizardStepsIndicator">
+                            <span class="live-wizard-step-chip active" data-live-step-chip="1">1</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="2">2</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="3">3</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="4">4</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="5">5</span>
                         </div>
                     </div>
 
-                    <div class="stack">
-                        <label for="liveDescription">Descripcion</label>
-                        <textarea id="liveDescription"></textarea>
-                    </div>
+                    <section class="live-wizard-step active" data-live-step="1">
+                        <div class="live-wizard-welcome">
+                            <div class="live-wizard-intro-animation" id="liveWizardIntroAnimation" data-animation-path="../Animaciones%20lottiefiles/vaso%20magico.json" aria-hidden="true"></div>
+                            <h3>Hola, vamos a hacer un live nuevo</h3>
+                            <p class="inline-help">Te guiaremos paso a paso para publicar tu live o reunion online.</p>
+                        </div>
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-primary" type="button" id="liveWizardStep1Next">Siguiente</button>
+                        </div>
+                    </section>
 
-                    <div class="stack">
-                        <label for="liveTargetStudents">Selecciona alumnos objetivo</label>
-                        <select id="liveTargetStudents" multiple></select>
-                        <label class="inline-help"><input id="liveForAll" type="checkbox"> Publicar para todos los alumnos</label>
-                    </div>
+                    <section class="live-wizard-step" data-live-step="2">
+                        <div class="live-wizard-intro-animation live-wizard-details-animation" id="liveWizardDetailsAnimation" data-animation-path="../Animaciones%20lottiefiles/palmera.json" aria-hidden="true"></div>
+                        <h3 class="live-wizard-step-title">Ingresa los datos requeridos de tu live</h3>
 
-                    <div class="actions-row">
-                        <button class="btn btn-primary" type="submit">Publicar live</button>
-                    </div>
+                        <div class="grid-2">
+                            <div class="stack">
+                                <label for="liveTitle">Titulo del live</label>
+                                <input id="liveTitle" type="text" required>
+                            </div>
+                            <div class="stack">
+                                <label for="liveSessionUrl">URL de YouTube o enlace de reunion</label>
+                                <input id="liveSessionUrl" type="url" required placeholder="https://www.youtube.com/watch?v=... o https://zoom.us/j/...">
+                            </div>
+                        </div>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep2Back">Atras</button>
+                            <button class="btn btn-primary" type="button" id="liveWizardStep2Next">Siguiente</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step" data-live-step="3">
+                        <h3 class="live-wizard-step-title">Fecha/Hora (opcional)</h3>
+
+                        <div class="live-date-time-layout">
+                            <div class="live-date-panel">
+                                <p class="live-date-kicker">Hoy</p>
+                                <h4 class="live-date-heading" id="liveDateDisplayHeading">Selecciona una fecha</h4>
+                                <div class="live-date-cards" id="liveDateCards"></div>
+                            </div>
+
+                            <div class="live-time-panel">
+                                <div class="live-clock-card" aria-hidden="true">
+                                    <div class="live-clock-face">
+                                        <span class="live-clock-hand live-clock-hand-hour" id="liveClockHourHand"></span>
+                                        <span class="live-clock-hand live-clock-hand-minute" id="liveClockMinuteHand"></span>
+                                        <span class="live-clock-center-dot"></span>
+                                    </div>
+                                    <p class="live-clock-digital" id="liveClockDigital">--:--</p>
+                                </div>
+
+                                <label for="liveTimeInput">Hora</label>
+                                <input id="liveTimeInput" type="time" step="60">
+                                <button class="btn btn-muted" type="button" id="liveClearDateTimeBtn">Quitar fecha y hora</button>
+                            </div>
+                        </div>
+
+                        <input id="liveStartsAt" type="datetime-local" class="hidden-select" tabindex="-1" aria-hidden="true">
+                        <span class="inline-help">Formato visual: dd/mm/aaaa --:--. Tambien puedes usar enlaces de Zoom o Classroom.</span>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep3Back">Atras</button>
+                            <button class="btn btn-primary" type="button" id="liveWizardStep3Next">Siguiente</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step" data-live-step="4">
+                        <div class="grid-2">
+                            <div class="stack">
+                                <label for="liveStatus">Estado</label>
+                                <select id="liveStatus">
+                                    <option value="draft">Borrador</option>
+                                    <option value="published">Publicado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="stack">
+                            <label for="liveDescription">Descripcion</label>
+                            <textarea id="liveDescription"></textarea>
+                        </div>
+
+                        <div class="stack">
+                            <label for="liveStudentsSearchInput">Selecciona alumnos aqui</label>
+
+                            <div class="live-students-toolbar">
+                                <div class="search-input-wrap">
+                                    <span class="search-icon" aria-hidden="true">&#128269;</span>
+                                    <input id="liveStudentsSearchInput" type="search" placeholder="Buscar alumnos por nombre, usuario o email">
+                                </div>
+                                <p class="inline-help" id="liveStudentsSelectionSummary">0 seleccionados</p>
+                            </div>
+
+                            <div class="actions-row live-students-actions">
+                                <button class="btn btn-secondary" type="button" id="liveSelectVisibleBtn">Seleccionar visibles ➜</button>
+                                <button class="btn btn-muted" type="button" id="liveDeselectVisibleBtn">⬅ Quitar visibles</button>
+                            </div>
+
+                            <div class="table-wrap live-students-table-wrap">
+                                <table class="live-students-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sel.</th>
+                                            <th>Perfil</th>
+                                            <th>Nombre</th>
+                                            <th>Usuario</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="liveStudentsTableBody"></tbody>
+                                </table>
+                            </div>
+
+                            <select id="liveTargetStudents" class="hidden-select" multiple aria-hidden="true" tabindex="-1"></select>
+                            <label class="inline-help"><input id="liveForAll" type="checkbox"> Publicar para todos los alumnos (opcional)</label>
+                        </div>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep4Back">Atras</button>
+                            <button class="btn btn-primary" type="button" id="liveWizardStep4Next">Siguiente</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step" data-live-step="5">
+                        <div class="mini-card live-review-card">
+                            <h3>Ventana final</h3>
+                            <p>Listo para publicar tu live.</p>
+                            <p class="inline-help" id="liveReviewSummary">Revisa la informacion y pulsa publicar.</p>
+                        </div>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep5Back">Atras</button>
+                            <button class="btn btn-primary" type="submit">Publicar live</button>
+                        </div>
+                    </section>
                 </form>
+            </section>
 
-                <div class="mini-card" style="margin-top: 16px;">
-                    <h3>Lives creados</h3>
-                    <div id="liveEventsList" class="list-board"></div>
+            <section class="section-card" id="liveCreatedSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Lives creados</h2>
+                        <p class="card-subtitle">Listado de lives y reuniones publicadas o en borrador</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshLiveEventsBtn">Actualizar</button>
                 </div>
+
+                <div class="list-board" id="liveEventsList"></div>
             </section>
 
             <section class="section-card" id="examsSection">
@@ -434,6 +441,7 @@
 
     <div id="toastContainer"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="../js/admin_dashboard.js"></script>
 </body>
 </html>
