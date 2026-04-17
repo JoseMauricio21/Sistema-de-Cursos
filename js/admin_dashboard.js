@@ -238,6 +238,48 @@ function normalizeLiveSessionUrl(rawUrl) {
     }
 }
 
+function extractYouTubeVideoId(rawUrl) {
+    if (!rawUrl) {
+        return '';
+    }
+
+    try {
+        const parsed = new URL(rawUrl);
+        const hostname = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+
+        if (hostname === 'youtu.be') {
+            return (parsed.pathname.split('/').filter(Boolean)[0] || '').trim();
+        }
+
+        if (hostname === 'youtube.com' || hostname === 'm.youtube.com' || hostname.endsWith('.youtube.com')) {
+            const searchId = parsed.searchParams.get('v');
+            if (searchId) {
+                return searchId.trim();
+            }
+
+            const pathParts = parsed.pathname.split('/').filter(Boolean);
+            const markerIndex = pathParts.findIndex((part) => ['embed', 'shorts', 'live', 'v'].includes(part.toLowerCase()));
+            if (markerIndex >= 0 && pathParts[markerIndex + 1]) {
+                return pathParts[markerIndex + 1].trim();
+            }
+        }
+    } catch (error) {
+        // Ignore parse errors and use regex fallback.
+    }
+
+    const match = String(rawUrl).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{6,})/i);
+    return match ? match[1] : '';
+}
+
+function buildYouTubeThumbnailUrl(rawUrl) {
+    const videoId = extractYouTubeVideoId(rawUrl);
+    if (!videoId) {
+        return '';
+    }
+
+    return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;
+}
+
 function getSelectedValues(selectId) {
     const selectEl = document.getElementById(selectId);
     if (!selectEl) {
@@ -1059,6 +1101,15 @@ function bindLiveEvents() {
                 return;
             }
 
+            const openButton = clickTarget.closest('[data-open-live]');
+            if (openButton instanceof HTMLButtonElement) {
+                const liveUrl = openButton.getAttribute('data-open-live');
+                if (liveUrl) {
+                    window.open(liveUrl, '_blank', 'noopener');
+                }
+                return;
+            }
+
             const deleteButton = clickTarget.closest('[data-delete-live]');
             if (!deleteButton) {
                 return;
@@ -1813,7 +1864,7 @@ async function deleteLiveEvent(liveId) {
 async function loadLiveEvents() {
     const { data, error } = await supabaseClient
         .from('live_events')
-        .select('id, title, status, youtube_url, starts_at, created_at')
+        .select('id, title, description, status, youtube_url, starts_at, created_at')
         .order('created_at', { ascending: false });
 
     const target = document.getElementById('liveEventsList');
@@ -1848,17 +1899,48 @@ async function loadLiveEvents() {
         .map((live) => {
             const statusClass = live.status === 'published' ? 'published' : 'draft';
             const assigned = assignmentCountMap[live.id] || 0;
+            const liveUrl = String(live.youtube_url || '').trim();
+            const youtubeThumb = buildYouTubeThumbnailUrl(liveUrl);
+            const platformLabel = youtubeThumb ? 'YouTube' : liveUrl ? 'Enlace online' : 'Sin enlace';
+            const startText = live.starts_at
+                ? new Date(live.starts_at).toLocaleString()
+                : 'Sin fecha';
+            const createdText = live.created_at
+                ? new Date(live.created_at).toLocaleDateString()
+                : '-';
+            const description = String(live.description || 'Live asignado por admin.');
+            const shortDescription = description.length > 120
+                ? `${description.slice(0, 117)}...`
+                : description;
+
             return `
-                <article class="mini-card">
-                    <div class="mini-row">
-                        <h4>${escapeHtml(live.title)}</h4>
-                        <span class="tag ${statusClass}">${escapeHtml(live.status)}</span>
+                <article class="mini-card admin-live-card">
+                    <div class="admin-live-media ${youtubeThumb ? 'has-preview' : 'no-preview'}">
+                        ${youtubeThumb
+                            ? `<img src="${escapeHtml(youtubeThumb)}" alt="Caratula de ${escapeHtml(live.title)}" loading="lazy" referrerpolicy="no-referrer">`
+                            : `
+                                <div class="admin-live-fallback">
+                                    <span class="admin-live-fallback-icon">&#127909;</span>
+                                    <span>Sin preview</span>
+                                </div>
+                            `
+                        }
+                        <span class="admin-live-badge">LIVE</span>
                     </div>
-                    <p class="inline-help">Alumnos asignados: ${assigned}</p>
-                    <p class="inline-help">Inicio: ${live.starts_at ? new Date(live.starts_at).toLocaleString() : 'Sin fecha'}</p>
-                    <div class="actions-row">
-                        <a href="${escapeHtml(live.youtube_url)}" target="_blank" rel="noopener" class="btn btn-secondary">Abrir enlace</a>
-                        <button class="btn btn-danger" type="button" data-delete-live="${escapeHtml(live.id)}">Eliminar live</button>
+
+                    <div class="admin-live-body">
+                        <div class="mini-row">
+                            <h4>${escapeHtml(live.title)}</h4>
+                            <span class="tag ${statusClass}">${escapeHtml(live.status)}</span>
+                        </div>
+                        <p class="inline-help">${escapeHtml(platformLabel)} | Alumnos: ${assigned}</p>
+                        <p class="inline-help">Inicio: ${escapeHtml(startText)}</p>
+                        <p class="inline-help">Creado: ${escapeHtml(createdText)}</p>
+                        <p class="admin-live-description">${escapeHtml(shortDescription)}</p>
+                        <div class="admin-live-actions">
+                            <button class="btn btn-secondary" type="button" data-open-live="${escapeHtml(liveUrl)}" ${liveUrl ? '' : 'disabled'}>Abrir enlace</button>
+                            <button class="btn btn-danger" type="button" data-delete-live="${escapeHtml(live.id)}">Eliminar live</button>
+                        </div>
                     </div>
                 </article>
             `;

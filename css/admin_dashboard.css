@@ -633,6 +633,109 @@ textarea {
     margin-bottom: 6px;
 }
 
+.admin-live-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 330px));
+    gap: 16px;
+    align-content: start;
+}
+
+.admin-live-card {
+    width: 100%;
+    max-width: 330px;
+    border: 1px solid #111111;
+    border-radius: 14px;
+    background: #ffffff;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-live-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid #111111;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.admin-live-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.admin-live-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #111111;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-live-fallback-icon {
+    font-size: 24px;
+}
+
+.admin-live-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #111111;
+    color: #ffffff;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.35px;
+}
+
+.admin-live-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-live-body h4 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.admin-live-description {
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #303030;
+    min-height: 36px;
+}
+
+.admin-live-actions {
+    margin-top: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.admin-live-actions .btn {
+    width: 100%;
+    padding: 9px 10px;
+}
+
+.admin-live-actions .btn[disabled] {
+    opacity: 0.58;
+    cursor: not-allowed;
+}
+
 .mini-row {
     display: flex;
     align-items: center;
@@ -968,5 +1071,13 @@ th {
 
     .admin-main {
         padding: 18px;
+    }
+
+    .admin-live-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .admin-live-card {
+        max-width: none;
     }
 }

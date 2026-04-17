@@ -2392,3 +2392,96 @@ body,
 .logout-modal .logout-modal-subtitle {
     color: #111111;
 }
+
+/* ========================================
+   TAB TITLE REMOVAL + SECTION TRANSITIONS
+   ======================================== */
+
+.page-title {
+    display: none !important;
+}
+
+.section-header h2 {
+    display: none !important;
+}
+
+.section-header {
+    margin-bottom: 14px;
+}
+
+.section-header .section-subtitle,
+.section-header > p {
+    margin-top: 0;
+    color: #303030;
+}
+
+.content-wrapper {
+    position: relative;
+    transform: translateZ(0);
+}
+
+.content-wrapper.section-nav-exit,
+.content-wrapper.section-nav-enter {
+    will-change: opacity, transform;
+    pointer-events: none;
+}
+
+.content-wrapper.section-nav-exit.is-forward {
+    animation: sectionFadeOutForward 0.17s ease forwards;
+}
+
+.content-wrapper.section-nav-exit.is-backward {
+    animation: sectionFadeOutBackward 0.17s ease forwards;
+}
+
+.content-wrapper.section-nav-enter.is-forward {
+    animation: sectionFadeInForward 0.28s ease forwards;
+}
+
+.content-wrapper.section-nav-enter.is-backward {
+    animation: sectionFadeInBackward 0.28s ease forwards;
+}
+
+@keyframes sectionFadeOutForward {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+}
+
+@keyframes sectionFadeInForward {
+    from {
+        opacity: 0;
+        transform: translateX(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes sectionFadeOutBackward {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(14px);
+    }
+}
+
+@keyframes sectionFadeInBackward {
+    from {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
 });
 
+const SECTION_ORDER = ['inicio', 'mis-cursos', 'examenes', 'mis-calificaciones', 'en-vivo'];
+let currentSection = '';
+let sectionTransitionToken = 0;
+
 // ========================================
 // INITIALIZE DASHBOARD
 // ========================================
@@ -98,6 +102,10 @@ function initializeNavigation() {
 }
 
 function setActiveSection(section) {
+    if (!SECTION_ORDER.includes(section)) {
+        return;
+    }
+
     // Remove active class from all radio inputs
     document.querySelectorAll('.radio-inputs input[name="nav-radio"]').forEach(input => {
         input.checked = false;
@@ -109,16 +117,68 @@ function setActiveSection(section) {
         selectedRadio.checked = true;
     }
 
-    // Load content from HTML file (async but don't wait for it)
-    loadSectionContent(section).catch(error => {
+    // Load content from HTML file with visual transition.
+    transitionSectionContent(section).catch(error => {
         console.error('Error in setActiveSection:', error);
     });
 
-    // Update page title
-    updatePageTitle(section);
-
     // Save current section preference
     localStorage.setItem('lastSection', section);
+}
+
+function getSectionDirection(nextSection) {
+    const currentIndex = SECTION_ORDER.indexOf(currentSection);
+    const nextIndex = SECTION_ORDER.indexOf(nextSection);
+
+    if (currentIndex < 0 || nextIndex < 0 || currentIndex === nextIndex) {
+        return 'forward';
+    }
+
+    return nextIndex > currentIndex ? 'forward' : 'backward';
+}
+
+function wait(ms) {
+    return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+    });
+}
+
+async function transitionSectionContent(section) {
+    const contentWrapper = document.getElementById('contentWrapper');
+    const token = ++sectionTransitionToken;
+    const direction = getSectionDirection(section);
+    const hasPreviousSection = Boolean(currentSection);
+
+    if (contentWrapper && hasPreviousSection && currentSection !== section) {
+        contentWrapper.classList.remove('section-nav-enter', 'section-nav-exit', 'is-forward', 'is-backward');
+        contentWrapper.classList.add('section-nav-exit', direction === 'backward' ? 'is-backward' : 'is-forward');
+        await wait(170);
+
+        if (token !== sectionTransitionToken) {
+            return;
+        }
+    }
+
+    await loadSectionContent(section);
+
+    if (token !== sectionTransitionToken) {
+        return;
+    }
+
+    if (contentWrapper) {
+        contentWrapper.classList.remove('section-nav-exit');
+        contentWrapper.classList.add('section-nav-enter', direction === 'backward' ? 'is-backward' : 'is-forward');
+
+        window.setTimeout(() => {
+            if (token !== sectionTransitionToken) {
+                return;
+            }
+
+            contentWrapper.classList.remove('section-nav-enter', 'is-forward', 'is-backward');
+        }, 280);
+    }
+
+    currentSection = section;
 }
 
 // Load content from separate HTML files
