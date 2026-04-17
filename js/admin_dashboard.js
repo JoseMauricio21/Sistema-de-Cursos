@@ -41,6 +41,9 @@ const state = {
     liveWizardTransitionRunning: false,
     liveIntroAnimation: null,
     liveDetailsAnimation: null,
+    livePublishedAnimation: null,
+    livePublishedRevealTimerId: null,
+    livePublishedAssignedCount: 0,
     liveDateOptions: [],
     liveSelectedDate: '',
     liveSelectedTime: '',
@@ -1101,6 +1104,11 @@ function bindLiveEvents() {
         form.addEventListener('submit', createLiveEvent);
     }
 
+    const livePublishedDoneBtn = document.getElementById('liveWizardPublishedDoneBtn');
+    if (livePublishedDoneBtn) {
+        livePublishedDoneBtn.addEventListener('click', completeLivePublishedStep);
+    }
+
     const step1NextBtn = document.getElementById('liveWizardStep1Next');
     if (step1NextBtn) {
         step1NextBtn.addEventListener('click', () => {
@@ -1510,8 +1518,94 @@ function initLiveWizardDetailsAnimation() {
     });
 }
 
+function initLivePublishedAnimation() {
+    const container = document.getElementById('liveWizardPublishedAnimation');
+    if (!container) {
+        return;
+    }
+
+    if (!window.lottie || typeof window.lottie.loadAnimation !== 'function') {
+        return;
+    }
+
+    const animationPath = container.getAttribute('data-animation-path');
+    if (!animationPath) {
+        return;
+    }
+
+    if (state.livePublishedAnimation && typeof state.livePublishedAnimation.destroy === 'function') {
+        state.livePublishedAnimation.destroy();
+    }
+
+    container.innerHTML = '';
+    state.livePublishedAnimation = window.lottie.loadAnimation({
+        container,
+        renderer: 'svg',
+        loop: false,
+        autoplay: false,
+        path: animationPath,
+    });
+}
+
+function activateLivePublishedStep() {
+    const confirmation = document.getElementById('livePublishedInlineConfirmation');
+    const summary = document.getElementById('livePublishedInlineSummary');
+
+    if (summary) {
+        summary.textContent = `Asignado a ${state.livePublishedAssignedCount} alumno(s).`;
+    }
+
+    if (confirmation) {
+        confirmation.classList.add('is-hidden');
+    }
+
+    if (state.livePublishedRevealTimerId) {
+        clearTimeout(state.livePublishedRevealTimerId);
+        state.livePublishedRevealTimerId = null;
+    }
+
+    initLivePublishedAnimation();
+
+    if (state.livePublishedAnimation && typeof state.livePublishedAnimation.goToAndPlay === 'function') {
+        state.livePublishedAnimation.goToAndPlay(0, true);
+    }
+
+    state.livePublishedRevealTimerId = window.setTimeout(() => {
+        if (confirmation) {
+            confirmation.classList.remove('is-hidden');
+        }
+    }, 520);
+}
+
+function enterLivePublishedStep(studentCount) {
+    state.livePublishedAssignedCount = studentCount;
+    animateLiveWizardStepChange(6);
+}
+
+function completeLivePublishedStep() {
+    const confirmation = document.getElementById('livePublishedInlineConfirmation');
+
+    if (state.livePublishedRevealTimerId) {
+        clearTimeout(state.livePublishedRevealTimerId);
+        state.livePublishedRevealTimerId = null;
+    }
+
+    if (confirmation) {
+        confirmation.classList.add('is-hidden');
+    }
+
+    if (state.livePublishedAnimation && typeof state.livePublishedAnimation.stop === 'function') {
+        state.livePublishedAnimation.stop();
+    }
+
+    showToast(`Live publicado correctamente para ${state.livePublishedAssignedCount} alumno(s).`, 'success');
+
+    resetLiveWizardFlow();
+    switchSection('liveSection');
+}
+
 function animateLiveWizardStepChange(step) {
-    const normalizedStep = Math.min(Math.max(Number(step) || 1, 1), 5);
+    const normalizedStep = Math.min(Math.max(Number(step) || 1, 1), 6);
     if (normalizedStep === state.liveWizardStep || state.liveWizardTransitionRunning) {
         return;
     }
@@ -1594,7 +1688,7 @@ function animateLiveWizardStepChange(step) {
 }
 
 function setLiveWizardStep(step) {
-    const normalizedStep = Math.min(Math.max(Number(step) || 1, 1), 5);
+    const normalizedStep = Math.min(Math.max(Number(step) || 1, 1), 6);
     state.liveWizardStep = normalizedStep;
 
     document.querySelectorAll('[data-live-step]').forEach((section) => {
@@ -1628,6 +1722,10 @@ function setLiveWizardStep(step) {
 
     if (normalizedStep === 5) {
         updateLiveReviewSummary();
+    }
+
+    if (normalizedStep === 6) {
+        activateLivePublishedStep();
     }
 }
 
@@ -1683,6 +1781,22 @@ function resetLiveWizardFlow() {
     state.liveSelectedStudentIds = [];
     state.liveSelectedDate = '';
     state.liveSelectedTime = '';
+    state.livePublishedAssignedCount = 0;
+
+    if (state.livePublishedRevealTimerId) {
+        clearTimeout(state.livePublishedRevealTimerId);
+        state.livePublishedRevealTimerId = null;
+    }
+
+    const publishedConfirmation = document.getElementById('livePublishedInlineConfirmation');
+    if (publishedConfirmation) {
+        publishedConfirmation.classList.add('is-hidden');
+    }
+
+    if (state.livePublishedAnimation && typeof state.livePublishedAnimation.stop === 'function') {
+        state.livePublishedAnimation.stop();
+    }
+
     syncLiveTargetStudentsSelect();
     initLiveDateTimePicker(true);
     updateLiveSelectorInteractivity();
@@ -1956,11 +2070,12 @@ async function createLiveEvent(event) {
         }
     }
 
-    resetLiveWizardFlow();
     await loadLiveEvents();
+
     if (status === 'published') {
-        showToast(`Live publicado correctamente para ${studentIds.length} alumno(s).`, 'success');
+        enterLivePublishedStep(studentIds.length);
     } else {
+        resetLiveWizardFlow();
         showToast('Live creado correctamente en borrador.', 'success');
     }
 }
@@ -2504,21 +2619,52 @@ function bindLogoutEvents() {
         return;
     }
 
-    logoutButton.addEventListener('click', () => {
+    let closeTimerId = null;
+
+    const openLogoutModal = () => {
+        if (closeTimerId) {
+            clearTimeout(closeTimerId);
+            closeTimerId = null;
+        }
+
+        logoutModal.classList.remove('is-closing');
         logoutModal.classList.add('visible');
+    };
+
+    const closeLogoutModal = () => {
+        if (!logoutModal.classList.contains('visible')) {
+            return;
+        }
+
+        logoutModal.classList.add('is-closing');
+
+        if (closeTimerId) {
+            clearTimeout(closeTimerId);
+        }
+
+        closeTimerId = window.setTimeout(() => {
+            logoutModal.classList.remove('visible', 'is-closing');
+            closeTimerId = null;
+        }, 210);
+    };
+
+    logoutButton.addEventListener('click', () => {
+        openLogoutModal();
     });
 
     cancelBtn.addEventListener('click', () => {
-        logoutModal.classList.remove('visible');
+        closeLogoutModal();
     });
 
     logoutModal.addEventListener('click', (event) => {
         if (event.target === logoutModal) {
-            logoutModal.classList.remove('visible');
+            closeLogoutModal();
         }
     });
 
     confirmBtn.addEventListener('click', async () => {
+        closeLogoutModal();
+        await waitForTransition(180);
         await logoutAdmin();
     });
 }

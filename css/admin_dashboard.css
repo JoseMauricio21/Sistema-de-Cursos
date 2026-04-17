@@ -59,6 +59,19 @@ body {
     background: transparent;
 }
 
+.brand-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.brand-logo {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
 .brand-title {
     font-size: 20px;
     font-weight: 700;
@@ -1044,10 +1057,17 @@ th {
     backdrop-filter: blur(4px);
     z-index: 60;
     padding: 20px;
+    opacity: 0;
 }
 
 .modal-overlay.visible {
     display: flex;
+    animation: modalOverlayFadeIn 0.22s ease forwards;
+}
+
+.modal-overlay.is-closing {
+    display: flex;
+    animation: modalOverlayFadeOut 0.2s ease forwards;
 }
 
 .modal-card {
@@ -1057,6 +1077,20 @@ th {
     border: 1px solid #111111;
     box-shadow: none;
     padding: 20px;
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+}
+
+.modal-overlay.visible .modal-card {
+    animation: modalCardFadeIn 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.modal-overlay.is-closing .modal-card {
+    animation: modalCardFadeOut 0.18s ease forwards;
+}
+
+#adminLogoutModal .modal-card {
+    border-radius: 16px;
 }
 
 .modal-card h3 {
@@ -1068,6 +1102,88 @@ th {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+}
+
+@keyframes modalOverlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalOverlayFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes modalCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalCardFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+}
+
+.live-published-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.live-published-step-animation {
+    width: min(260px, 66vw);
+    height: min(260px, 66vw);
+    margin: 0 auto 6px;
+}
+
+.live-published-step-confirmation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: opacity 0.36s ease, transform 0.36s ease;
+}
+
+.live-published-step-confirmation .inline-help {
+    font-size: clamp(14px, 2vw, 18px);
+}
+
+.live-published-step-actions {
+    justify-content: center;
+    padding-top: 4px;
+    margin-top: 0;
+}
+
+.live-published-step-confirmation.is-hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
 }
 
 #toastContainer {

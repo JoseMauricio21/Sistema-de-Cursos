@@ -1,6 +1,7 @@
 // Supabase configuration for browser auth flows
 const SUPABASE_URL = 'https://mfhfeytlgmkxuzlclawx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_TBRrwMbabN6X0NcO5656ew_imJDTeaj';
+const POST_LOGIN_LOADING_PATH = '/pages/loading.html';
 
 let supabaseClient = null;
 
@@ -182,6 +183,14 @@ function buildLocalUser(user, profile, fallbackName) {
     };
 }
 
+function getPostLoginTarget(localUser) {
+    if (localUser?.role === 'admin') {
+        return '/pages/admin_dashboard.html';
+    }
+
+    return '/pages/curso_dashboard.html';
+}
+
 async function resolveEmailForLogin(loginIdentifier) {
     const normalized = loginIdentifier.trim().toLowerCase();
 
@@ -324,11 +333,8 @@ async function validateLoginForm(event) {
             sessionStorage.removeItem('accessToken');
         }
 
-        if (localUser.role === 'admin') {
-            window.location.href = '/pages/admin_dashboard.html';
-        } else {
-            window.location.href = '/pages/curso_dashboard.html';
-        }
+        sessionStorage.setItem('postLoginTarget', getPostLoginTarget(localUser));
+        window.location.href = POST_LOGIN_LOADING_PATH;
     } catch (error) {
         console.error('Error de login:', error);
         showError('email', getFriendlyAuthError(error));
@@ -477,7 +483,7 @@ async function loginWithGoogle() {
     const { error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${window.location.origin}/pages/curso_dashboard.html`,
+            redirectTo: `${window.location.origin}${POST_LOGIN_LOADING_PATH}`,
         },
     });
 

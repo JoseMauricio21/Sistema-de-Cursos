@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando - English Learning Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <main class="loading-screen" aria-live="polite">
+        <section class="loading-card">
+            <div class="avatar-circle" id="loadingAvatar">
+                <span class="avatar-spinner" aria-hidden="true"></span>
+                <img id="loadingAvatarImage" alt="Foto de perfil">
+                <i class="fas fa-user avatar-fallback" id="loadingAvatarFallback" aria-hidden="true"></i>
+            </div>
+
+            <div class="loading-message">
+                <h1 id="loadingGreeting">Preparando tu acceso...</h1>
+                <p>Estamos cargando tu panel personal.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/loading.js"></script>
+</body>
+</html>

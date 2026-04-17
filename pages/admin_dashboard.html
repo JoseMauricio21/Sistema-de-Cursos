@@ -11,8 +11,13 @@
     <div class="admin-shell">
         <aside class="admin-sidebar">
             <div class="brand-block">
-                <div class="brand-title">Admin Studio</div>
-                <p class="brand-subtitle">Gestion de cursos, alumnos, lives, examenes y grupos</p>
+                <div class="brand-header">
+                    <img src="../images/logo neo.png" alt="Logo Studio Eleah" class="brand-logo" loading="lazy">
+                    <div>
+                        <div class="brand-title">Studio Eleah</div>
+                        <p class="brand-subtitle">Crea, organiza, da mas de ti a tus alumnos.</p>
+                    </div>
+                </div>
             </div>
 
             <nav class="side-nav" id="adminNav">
@@ -106,6 +111,7 @@
                             <span class="live-wizard-step-chip" data-live-step-chip="3">3</span>
                             <span class="live-wizard-step-chip" data-live-step-chip="4">4</span>
                             <span class="live-wizard-step-chip" data-live-step-chip="5">5</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="6">6</span>
                         </div>
                     </div>
 
@@ -243,6 +249,18 @@
                         <div class="actions-row live-wizard-actions">
                             <button class="btn btn-muted" type="button" id="liveWizardStep5Back">Atras</button>
                             <button class="btn btn-primary" type="submit">Publicar live</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step live-published-step" data-live-step="6">
+                        <div class="live-wizard-intro-animation live-published-step-animation" id="liveWizardPublishedAnimation" data-animation-path="../Animaciones%20lottiefiles/listo.json" aria-hidden="true"></div>
+
+                        <div class="live-published-step-confirmation is-hidden" id="livePublishedInlineConfirmation">
+                            <h3 class="live-wizard-step-title">Listo Live Publicado</h3>
+                            <p class="inline-help" id="livePublishedInlineSummary">Tu live ya quedo publicado.</p>
+                            <div class="actions-row live-wizard-actions live-published-step-actions">
+                                <button class="btn btn-primary" id="liveWizardPublishedDoneBtn" type="button">Listo</button>
+                            </div>
                         </div>
                     </section>
                 </form>
