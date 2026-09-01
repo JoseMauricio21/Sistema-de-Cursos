@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - English Learning Platform</title>
+    <link rel="stylesheet" href="../css/admin_dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <div class="brand-block">
+                <div class="brand-header">
+                    <img src="../images/logo neo.png" alt="Logo Studio Eleah" class="brand-logo" loading="lazy">
+                    <div>
+                        <div class="brand-title">Studio Eleah</div>
+                        <p class="brand-subtitle">Crea, organiza, da mas de ti a tus alumnos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="side-nav" id="adminNav">
+                <button class="active" data-section="coursesSection">Cursos</button>
+                <button data-section="studentsSection">Alumnos</button>
+                <button data-section="liveSection">Hacer live</button>
+                <button data-section="liveCreatedSection">Lives creados</button>
+                <button data-section="examsSection">Examenes</button>
+                <button data-section="groupsSection">Mis grupos</button>
+                <button data-section="createGroupSection">Crear grupo</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-danger" id="adminLogoutBtn">Cerrar sesion</button>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <div class="admin-welcome-line">
+                    <a class="admin-profile-link icon-only" href="./admin_perfil.html" id="adminProfileLink" aria-label="Abrir perfil de admin">
+                        <span class="admin-avatar" id="adminUserAvatar" data-initial="A">
+                            <img id="adminUserAvatarImage" alt="Foto de perfil admin" loading="lazy" referrerpolicy="no-referrer">
+                        </span>
+                    </a>
+                    <div class="admin-welcome-text">
+                        <h1 id="sectionTitle">Buenos dias</h1>
+                        <p id="sectionWelcomeLine">Bienvenida, Nombre del usuario</p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="section-card active" id="coursesSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Cursos creados</h2>
+                        <p class="card-subtitle">Listado de cursos publicados y en borrador</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshCoursesBtn">Actualizar</button>
+                </div>
+                <div class="list-board" id="coursesList"></div>
+            </section>
+
+            <section class="section-card" id="studentsSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Alumnos registrados</h2>
+                        <p class="card-subtitle">Editar correo, contrasena, nombre de usuario y foto</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshStudentsBtn">Actualizar</button>
+                </div>
+
+                <div class="students-toolbar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon" aria-hidden="true">&#128269;</span>
+                        <input id="studentsSearchInput" type="search" placeholder="Buscar por nombre, usuario o email">
+                    </div>
+                    <p class="inline-help" id="studentsResultCount">0 alumnos</p>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="students-table">
+                        <thead>
+                            <tr>
+                                <th>Perfil</th>
+                                <th>Nombre</th>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section-card" id="liveSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Crear live</h2>
+                        <p class="card-subtitle">Publica un live con enlace de YouTube, Zoom o Google Classroom y asigna alumnos</p>
+                    </div>
+                </div>
+
+                <form id="liveForm" class="stack live-wizard-form">
+                    <div class="live-wizard-header">
+                        <div class="live-wizard-steps" id="liveWizardStepsIndicator">
+                            <span class="live-wizard-step-chip active" data-live-step-chip="1">1</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="2">2</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="3">3</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="4">4</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="5">5</span>
+                            <span class="live-wizard-step-chip" data-live-step-chip="6">6</span>
+                        </div>
+                    </div>
+
+                    <section class="live-wizard-step active" data-live-step="1">
+                        <div class="live-wizard-welcome">
+                            <div class="live-wizard-intro-animation" id="liveWizardIntroAnimation" data-animation-path="../Animaciones%20lottiefiles/vaso%20magico.json" aria-hidden="true"></div>
+                            <h3>Hola, vamos a hacer un live nuevo</h3>
+                            <p class="inline-help">Te guiaremos paso a paso para publicar tu live o reunion online.</p>
+                        </div>
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-primary" type="button" id="liveWizardStep1Next">Siguiente</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step" data-live-step="2">
+                        <div class="live-wizard-intro-animation live-wizard-details-animation" id="liveWizardDetailsAnimation" data-animation-path="../Animaciones%20lottiefiles/palmera.json" aria-hidden="true"></div>
+                        <h3 class="live-wizard-step-title">Ingresa los datos requeridos de tu live</h3>
+
+                        <div class="grid-2">
+                            <div class="stack">
+                                <label for="liveTitle">Titulo del live</label>
+                                <input id="liveTitle" type="text" required>
+                            </div>
+                            <div class="stack">
+                                <label for="liveSessionUrl">URL de YouTube o enlace de reunion</label>
+                                <input id="liveSessionUrl" type="url" required placeholder="https://www.youtube.com/watch?v=... o https://zoom.us/j/...">
+                            </div>
+                        </div>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep2Back">Atras</button>
+                            <button class="btn btn-primary" type="button" id="liveWizardStep2Next">Siguiente</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step" data-live-step="3">
+                        <h3 class="live-wizard-step-title">Fecha/Hora (opcional)</h3>
+
+                        <div class="live-date-time-layout">
+                            <div class="live-date-panel">
+                                <p class="live-date-kicker">Hoy</p>
+                                <h4 class="live-date-heading" id="liveDateDisplayHeading">Selecciona una fecha</h4>
+                                <div class="live-date-cards" id="liveDateCards"></div>
+                            </div>
+
+                            <div class="live-time-panel">
+                                <div class="live-clock-card" aria-hidden="true">
+                                    <div class="live-clock-face">
+                                        <span class="live-clock-hand live-clock-hand-hour" id="liveClockHourHand"></span>
+                                        <span class="live-clock-hand live-clock-hand-minute" id="liveClockMinuteHand"></span>
+                                        <span class="live-clock-center-dot"></span>
+                                    </div>
+                                    <p class="live-clock-digital" id="liveClockDigital">--:--</p>
+                                </div>
+
+                                <label for="liveTimeInput">Hora</label>
+                                <input id="liveTimeInput" type="time" step="60">
+                                <button class="btn btn-muted" type="button" id="liveClearDateTimeBtn">Quitar fecha y hora</button>
+                            </div>
+                        </div>
+
+                        <input id="liveStartsAt" type="datetime-local" class="hidden-select" tabindex="-1" aria-hidden="true">
+                        <span class="inline-help">Formato visual: dd/mm/aaaa --:--. Tambien puedes usar enlaces de Zoom o Classroom.</span>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep3Back">Atras</button>
+                            <button class="btn btn-primary" type="button" id="liveWizardStep3Next">Siguiente</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step" data-live-step="4">
+                        <div class="grid-2">
+                            <div class="stack">
+                                <label for="liveStatus">Estado</label>
+                                <select id="liveStatus">
+                                    <option value="draft">Borrador</option>
+                                    <option value="published">Publicado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="stack">
+                            <label for="liveDescription">Descripcion</label>
+                            <textarea id="liveDescription"></textarea>
+                        </div>
+
+                        <div class="stack">
+                            <label for="liveStudentsSearchInput">Selecciona alumnos aqui</label>
+
+                            <div class="live-students-toolbar">
+                                <div class="search-input-wrap">
+                                    <span class="search-icon" aria-hidden="true">&#128269;</span>
+                                    <input id="liveStudentsSearchInput" type="search" placeholder="Buscar alumnos por nombre, usuario o email">
+                                </div>
+                                <p class="inline-help" id="liveStudentsSelectionSummary">0 seleccionados</p>
+                            </div>
+
+                            <div class="actions-row live-students-actions">
+                                <button class="btn btn-secondary" type="button" id="liveSelectVisibleBtn">Seleccionar visibles ➜</button>
+                                <button class="btn btn-muted" type="button" id="liveDeselectVisibleBtn">⬅ Quitar visibles</button>
+                            </div>
+
+                            <div class="table-wrap live-students-table-wrap">
+                                <table class="live-students-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sel.</th>
+                                            <th>Perfil</th>
+                                            <th>Nombre</th>
+                                            <th>Usuario</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="liveStudentsTableBody"></tbody>
+                                </table>
+                            </div>
+
+                            <select id="liveTargetStudents" class="hidden-select" multiple aria-hidden="true" tabindex="-1"></select>
+                            <label class="inline-help"><input id="liveForAll" type="checkbox"> Publicar para todos los alumnos (opcional)</label>
+                        </div>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep4Back">Atras</button>
+                            <button class="btn btn-primary" type="button" id="liveWizardStep4Next">Siguiente</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step" data-live-step="5">
+                        <div class="mini-card live-review-card">
+                            <h3>Ventana final</h3>
+                            <p>Listo para publicar tu live.</p>
+                            <p class="inline-help" id="liveReviewSummary">Revisa la informacion y pulsa publicar.</p>
+                        </div>
+
+                        <div class="actions-row live-wizard-actions">
+                            <button class="btn btn-muted" type="button" id="liveWizardStep5Back">Atras</button>
+                            <button class="btn btn-primary" type="submit">Publicar live</button>
+                        </div>
+                    </section>
+
+                    <section class="live-wizard-step live-published-step" data-live-step="6">
+                        <div class="live-wizard-intro-animation live-published-step-animation" id="liveWizardPublishedAnimation" data-animation-path="../Animaciones%20lottiefiles/listo.json" aria-hidden="true"></div>
+
+                        <div class="live-published-step-confirmation is-hidden" id="livePublishedInlineConfirmation">
+                            <h3 class="live-wizard-step-title">Listo Live Publicado</h3>
+                            <p class="inline-help" id="livePublishedInlineSummary">Tu live ya quedo publicado.</p>
+                            <div class="actions-row live-wizard-actions live-published-step-actions">
+                                <button class="btn btn-primary" id="liveWizardPublishedDoneBtn" type="button">Listo</button>
+                            </div>
+                        </div>
+                    </section>
+                </form>
+            </section>
+
+            <section class="section-card" id="liveCreatedSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Lives creados</h2>
+                        <p class="card-subtitle">Listado de lives y reuniones publicadas o en borrador</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshLiveEventsBtn">Actualizar</button>
+                </div>
+
+                <div class="list-board admin-live-grid" id="liveEventsList"></div>
+            </section>
+
+            <section class="section-card" id="examsSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Examenes (forms completo)</h2>
+                        <p class="card-subtitle">Crea preguntas, publica examen y asigna alumnos</p>
+                    </div>
+                </div>
+
+                <form id="examForm" class="stack">
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="examTitle">Titulo del examen</label>
+                            <input id="examTitle" type="text" required>
+                        </div>
+                        <div class="stack">
+                            <label for="examStatus">Estado</label>
+                            <select id="examStatus">
+                                <option value="draft">Borrador</option>
+                                <option value="published">Publicado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="examAvailableFrom">Disponible desde</label>
+                            <input id="examAvailableFrom" type="datetime-local">
+                        </div>
+                        <div class="stack">
+                            <label for="examAvailableTo">Disponible hasta</label>
+                            <input id="examAvailableTo" type="datetime-local">
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <label for="examDescription">Descripcion</label>
+                        <textarea id="examDescription"></textarea>
+                    </div>
+
+                    <div class="mini-card stack">
+                        <h3>Constructor de preguntas</h3>
+                        <div class="grid-3">
+                            <div class="stack">
+                                <label for="examQuestionText">Pregunta</label>
+                                <input id="examQuestionText" type="text">
+                            </div>
+                            <div class="stack">
+                                <label for="examQuestionOptions">Opciones (coma o salto de linea)</label>
+                                <input id="examQuestionOptions" type="text" placeholder="A, B, C">
+                            </div>
+                            <div class="stack">
+                                <label for="examQuestionAnswer">Respuesta correcta</label>
+                                <input id="examQuestionAnswer" type="text" placeholder="1 o texto">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="stack">
+                                <label for="examQuestionPoints">Puntos</label>
+                                <input id="examQuestionPoints" type="number" min="1" step="1" value="1">
+                            </div>
+                        </div>
+                        <div class="actions-row">
+                            <button class="btn btn-secondary" type="button" id="addExamQuestionBtn">Agregar pregunta al examen</button>
+                        </div>
+                        <div id="examQuestionsDraft" class="list-board"></div>
+                    </div>
+
+                    <div class="stack">
+                        <label for="examTargetStudents">Selecciona alumnos objetivo</label>
+                        <select id="examTargetStudents" multiple></select>
+                        <label class="inline-help"><input id="examForAll" type="checkbox"> Asignar a todos los alumnos</label>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="btn btn-primary" type="submit">Crear y asignar examen</button>
+                    </div>
+                </form>
+
+                <div class="mini-card" style="margin-top: 16px;">
+                    <h3>Examenes creados</h3>
+                    <div id="examsList" class="list-board"></div>
+                </div>
+            </section>
+
+            <section class="section-card" id="groupsSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Mis grupos</h2>
+                        <p class="card-subtitle">Visualiza grupos creados y sus miembros</p>
+                    </div>
+                    <button class="btn btn-secondary" id="refreshGroupsBtn">Actualizar</button>
+                </div>
+
+                <div id="groupsList" class="list-board"></div>
+            </section>
+
+            <section class="section-card" id="createGroupSection">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Crear grupo</h2>
+                        <p class="card-subtitle">Selecciona alumnos registrados y asignalos a un grupo</p>
+                    </div>
+                </div>
+
+                <form id="createGroupForm" class="stack">
+                    <div class="grid-2">
+                        <div class="stack">
+                            <label for="groupName">Nombre del grupo</label>
+                            <input id="groupName" type="text" required placeholder="Ej. Grupo A1 Manana">
+                        </div>
+                        <div class="stack">
+                            <label for="groupDescription">Descripcion</label>
+                            <input id="groupDescription" type="text" placeholder="Descripcion del grupo">
+                        </div>
+                    </div>
+
+                    <div class="selector-grid">
+                        <div class="stack">
+                            <label for="groupStudentMembers">Alumnos del grupo</label>
+                            <select id="groupStudentMembers" multiple></select>
+                        </div>
+                        <div class="stack">
+                            <label for="groupCourseList">Cursos para asignar al grupo (opcional)</label>
+                            <select id="groupCourseList" multiple></select>
+                        </div>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="btn btn-primary" type="submit">Crear grupo</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="studentEditModal">
+        <div class="modal-card">
+            <h3>Editar alumno</h3>
+            <input type="hidden" id="editStudentId">
+
+            <div class="grid-2">
+                <div class="stack">
+                    <label for="editStudentName">Nombre completo</label>
+                    <input id="editStudentName" type="text">
+                </div>
+                <div class="stack">
+                    <label for="editStudentUsername">Usuario</label>
+                    <input id="editStudentUsername" type="text" placeholder="usuario">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="stack">
+                    <label for="editStudentEmail">Email</label>
+                    <input id="editStudentEmail" type="email">
+                </div>
+                <div class="stack">
+                    <label for="editStudentPassword">Nueva contrasena (opcional)</label>
+                    <input id="editStudentPassword" type="password" placeholder="Dejar vacio para no cambiar">
+                </div>
+            </div>
+
+            <div class="stack">
+                <label for="editStudentAvatar">Foto (URL)</label>
+                <input id="editStudentAvatar" type="url" placeholder="https://...">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-muted" id="cancelStudentEditBtn" type="button">Cancelar</button>
+                <button class="btn btn-primary" id="saveStudentEditBtn" type="button">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="adminLogoutModal">
+        <div class="modal-card">
+            <h3>Cerrar sesion</h3>
+            <p class="card-subtitle">Quieres cerrar tu sesion de administracion?</p>
+            <div class="modal-actions">
+                <button class="btn btn-muted" id="cancelAdminLogoutBtn" type="button">Cancelar</button>
+                <button class="btn btn-danger" id="confirmAdminLogoutBtn" type="button">Si, cerrar sesion</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <script type="module" src="../js/supabase-config.js"></script>
+    <script type="module" src="../js/admin_dashboard.js"></script>
+</body>
+</html>

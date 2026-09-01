@@ -1,0 +1,521 @@
+/* ========================================
+   PROFILE PAGE STYLES - APPLE DESIGN
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #4f46e5;
+    --primary-dark: #4338ca;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --bg-white: #ffffff;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+    color: var(--text-dark);
+    overflow: hidden;
+}
+
+/* ========================================
+   VIDEO BACKGROUND
+   ======================================== */
+
+.bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* ========================================
+   PROFILE CONTAINER
+   ======================================== */
+
+.profile-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+/* ========================================
+   PROFILE HEADER
+   ======================================== */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--bg-white);
+    letter-spacing: -0.5px;
+}
+
+.back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--bg-white);
+    cursor: pointer;
+    font-size: 20px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+/* ========================================
+   PROFILE CONTENT
+   ======================================== */
+
+.profile-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+    gap: 40px;
+}
+
+/* ========================================
+   PROFILE PICTURE SECTION
+   ======================================== */
+
+.profile-picture-section {
+    text-align: center;
+}
+
+.profile-picture-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+#profileImage {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transition: var(--transition);
+}
+
+#profileImage:hover {
+    transform: scale(1.05);
+}
+
+.upload-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), #6366f1);
+    color: white;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: var(--transition);
+    box-shadow: 0 10px 28px rgba(79, 70, 229, 0.35);
+}
+
+.upload-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.45);
+}
+
+/* ========================================
+   PROFILE FORM - APPLE STYLE
+   ======================================== */
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 28px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   FORM GROUP - FLOATING LABEL STYLE
+   ======================================== */
+
+.form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 16px 0;
+    border: none;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--bg-white);
+    transition: var(--transition);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-bottom-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.form-group input:focus::placeholder,
+.form-group textarea:focus::placeholder {
+    color: transparent;
+}
+
+.form-label {
+    position: absolute;
+    top: 16px;
+    left: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    transition: var(--transition);
+    pointer-events: none;
+}
+
+/* Move label up when input is focused or has value */
+.form-group input:focus ~ .form-label,
+.form-group textarea:focus ~ .form-label,
+.form-group input:not(:placeholder-shown) ~ .form-label,
+.form-group textarea:not(:placeholder-shown) ~ .form-label {
+    transform: translateY(-24px);
+    font-size: 12px;
+    color: var(--primary-color);
+}
+
+.form-group input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    padding: 16px 0;
+}
+
+.form-group small {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 6px;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #6366f1);
+    color: white;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(79, 70, 229, 0.45);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-large {
+    width: 100%;
+    padding: 16px 28px;
+    font-size: 17px;
+    margin-top: 12px;
+}
+
+/* ========================================
+   STATUS MESSAGES
+   ======================================== */
+
+.loading-indicator {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    background: rgba(100, 200, 255, 0.15);
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 200, 255, 0.2);
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.success-message {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+    animation: slideIn 0.3s ease-out;
+}
+
+.error-message {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+    .profile-header {
+        padding: 16px 20px;
+    }
+
+    .profile-header h1 {
+        font-size: 22px;
+    }
+
+    .profile-content {
+        padding: 24px 20px;
+        gap: 30px;
+    }
+
+    #profileImage {
+        width: 110px;
+        height: 110px;
+    }
+
+    .upload-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+
+    .profile-form {
+        max-width: 100%;
+        padding: 32px 24px;
+        border-radius: 24px;
+        gap: 24px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 14px 0;
+    }
+
+    .form-label {
+        font-size: 13px;
+    }
+
+    .form-group input:focus ~ .form-label,
+    .form-group textarea:focus ~ .form-label,
+    .form-group input:not(:placeholder-shown) ~ .form-label,
+    .form-group textarea:not(:placeholder-shown) ~ .form-label {
+        transform: translateY(-22px);
+    }
+
+    .btn {
+        padding: 12px 24px;
+        font-size: 15px;
+    }
+
+    .btn-large {
+        padding: 14px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        padding: 12px 16px;
+    }
+
+    .profile-header h1 {
+        font-size: 20px;
+    }
+
+    .profile-content {
+        padding: 16px 16px;
+        gap: 24px;
+    }
+
+    #profileImage {
+        width: 100px;
+        height: 100px;
+    }
+
+    .upload-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+
+    .profile-form {
+        padding: 24px 20px;
+        border-radius: 20px;
+        gap: 20px;
+    }
+
+    .form-group {
+        gap: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 12px 0;
+        font-size: 15px;
+    }
+
+    .form-label {
+        font-size: 12px;
+    }
+
+    .form-group input:focus ~ .form-label,
+    .form-group textarea:focus ~ .form-label,
+    .form-group input:not(:placeholder-shown) ~ .form-label,
+    .form-group textarea:not(:placeholder-shown) ~ .form-label {
+        transform: translateY(-20px);
+        font-size: 11px;
+    }
+
+    .btn-primary {
+        font-size: 15px;
+    }
+
+    .profile-content {
+        justify-content: flex-start;
+        padding-top: 30px;
+    }
+
+    .profile-container {
+        overflow-y: auto;
+    }
+}

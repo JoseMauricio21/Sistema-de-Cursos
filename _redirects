@@ -1,0 +1,4 @@
+# Redirects for Cloudflare Pages
+# Single Page App fallback
+/* /index.html 200
+
