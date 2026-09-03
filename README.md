@@ -107,4 +107,19 @@ El proyecto fue desarrollado utilizando:
 
 ## Open Source
 
-Este proyecto es de código abierto y fue desarrollado con fines educativos. Puedes consultar, modificar y contribuir al código.
+<div align="center">
+
+<h2 style="font-family: 'Times New Roman', Times, serif;">
+  Open Source
+</h2>
+
+<img src="https://www.muylinux.com/wp-content/uploads/2010/05/opensource-logo.png" 
+     width="180" 
+     alt="Open Source Logo">
+
+<p style="font-family: 'Times New Roman', Times, serif;">
+  Este proyecto es de código abierto y fue desarrollado con fines educativos.
+  Puedes consultar, modificar y contribuir al código.
+</p>
+
+</div>
