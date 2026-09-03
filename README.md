@@ -52,7 +52,11 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 
 <h3>Base de datos en Supabase</h3>
 
-<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="100">
+<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="120">
+
+<p>
+  Gestión y almacenamiento de la información de la plataforma mediante Supabase.
+</p>
 
 </div>
 
