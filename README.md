@@ -2,84 +2,73 @@
 
 Una plataforma web para el aprendizaje de inglés con sistema de autenticación completo.
 
-## 📁 Estructura del Proyecto
+# Página Web de ELEAH
 
-```
-Pagina de Ingles/
+Plataforma web desarrollada para ELEAH, enfocada en ofrecer cursos de inglés y diferentes recursos digitales para apoyar el aprendizaje de los estudiantes.
+
+El sitio reúne material didáctico, videos, infografías y actividades relacionadas con el aprendizaje del idioma inglés, buscando presentar la información de una manera clara, sencilla y accesible.
+
+## Características
+
+- Presentación de la plataforma ELEAH
+- Cursos de inglés
+- Material didáctico
+- Videos educativos
+- Infografías
+- Actividades de aprendizaje
+- Contenido organizado por temas
+- Interfaz sencilla y fácil de utilizar
+- Diseño adaptable a diferentes dispositivos
+
+## Contenido de la plataforma
+
+La página cuenta con diferentes recursos destinados al aprendizaje del inglés, entre ellos:
+
+### Cursos de inglés
+
+Contenido organizado para que los estudiantes puedan consultar diferentes temas y reforzar sus conocimientos del idioma.
+
+### Material didáctico
+
+Recursos de apoyo utilizados para complementar los temas vistos durante los cursos.
+
+### Videos
+
+Material audiovisual utilizado para explicar temas y facilitar la comprensión de los contenidos.
+
+### Infografías
+
+Recursos visuales que presentan información de manera resumida y fácil de consultar.
+
+## Tecnologías utilizadas
+
+El proyecto fue desarrollado utilizando:
+
+- HTML5
+- CSS3
+- JavaScript
+
+## Estructura del proyecto
+
+```text
+Sistema-de-Cursos/
 │
-├── index.html                 # Página principal con introducción
+├── assets/
+│   ├── images/
+│   ├── videos/
+│   └── icons/
 │
 ├── css/
-│   └── styles.css            # Estilos principales (compartidos)
+│   └── styles.css
 │
 ├── js/
-│   └── script.js             # Validaciones con JavaScript
+│   └── app.js
 │
 ├── pages/
-│   ├── login.html            # Página de iniciar sesión
-│   └── register.html         # Página de registro
+│   ├── index.html
+│   ├── cursos.html
+│   ├── material.html
+│   ├── videos.html
+│   └── infografias.html
 │
-├── images/                    # Carpeta para imágenes (vacía)
-│
-└── README.md                 # Este archivo
-```
-
-## 🎨 Características
-
-- **Página Principal (index.html)**
-  - Introducción a la plataforma
-  - Botones para Iniciar Sesión y Registrarse
-  - Sección de características disponibles
-  - Diseño responsivo
-
-- **Página de Login (pages/login.html)**
-  - Formulario con validación
-  - Campo de email y contraseña
-  - Validación en tiempo real
-  - Enlace a registro
-
-- **Página de Registro (pages/register.html)**
-  - Formulario completo de registro
-  - Campos: Nombre, Email, Contraseña, Confirmar Contraseña
-  - Validaciones de seguridad
-  - Verificación de coincidencia de contraseñas
-
-## 🎯 Validaciones Incluidas
-
-- ✅ Email válido
-- ✅ Contraseña mínimo 6 caracteres
-- ✅ Nombre completo de al menos 3 caracteres
-- ✅ Confirmación de contraseña
-- ✅ Mensajes de error claros
-
-## 🚀 Cómo Usar
-
-1. Abre `index.html` en tu navegador
-2. Haz clic en "Iniciar Sesión" para ver la página de login
-3. Haz clic en "Registrarse" para ver la página de registro
-4. Completa los formularios y prueba las validaciones
-
-## 🎨 Diseño
-
-- Gradiente de colores atractivo (azul a púrpura)
-- Interfaz moderna y limpia
-- Totalmente responsivo (funciona en móvil, tablet y desktop)
-- Botones con efectos hover
-- Transiciones suaves
-
-## 📝 Notas
-
-- Los formularios incluyen validaciones básicas del lado del cliente
-- Para una aplicación real, se debe implementar validación del lado del servidor
-- Los datos actualmente no se guardan (es un prototipo)
-- Los estilos están centralizados en `css/styles.css` para mantener consistencia
-- Las validaciones están en `js/script.js` para reutilización
-
-## 🔧 Próximas Mejoras Sugeridas
-
-- Integración con base de datos
-- Autenticación segura del lado del servidor
-- Hash de contraseñas
-- Confirmación de email
-- Recuperación de contraseña
-- Autenticación con redes sociales
+└── README.md
