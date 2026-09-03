@@ -101,13 +101,12 @@ Recursos visuales que presentan información de manera resumida y fácil de cons
 
 <!-- LANGUAGES:START -->
 
-<div align="center">
-
-| Lenguaje | Uso |
-|:---:|:---:|
-| Cargando... | ⏳ |
-
-</div>
+| Lenguaje | Porcentaje |
+|:--------:|:----------:|
+| **JavaScript** | 41.23% |
+| **PLpgSQL** | 23.74% |
+| **CSS** | 20.93% |
+| **HTML** | 14.11% |
 
 <!-- LANGUAGES:END -->
 
