@@ -6,6 +6,7 @@
 Una plataforma web para el aprendizaje de inglés con sistema de autenticación completo.
 
 </div>
+
 <div align="center">
 
 [![GitHub Stars](https://img.shields.io/github/stars/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=Stars)](https://github.com/JoseMauricio21/Sistema-de-Cursos/stargazers)
