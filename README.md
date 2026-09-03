@@ -50,7 +50,7 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 <div align="center">
   
 ## Diagrama de Funciomamiento "Arquitectura de software"
-### Cómo una aplicación web estática desplegada en Cloudflare Pages utiliza HTML y JavaScript en el navegador para autenticarse mediante Supabase Auth, consumir datos mediante la API de Supabase, almacenar información en PostgreSQL y archivos en Storage, mientras que las migraciones SQL y las políticas RLS definen la estructura y seguridad del sistema
+#### Cómo una aplicación web estática desplegada en Cloudflare Pages utiliza HTML y JavaScript en el navegador para autenticarse mediante Supabase Auth, consumir datos mediante la API de Supabase, almacenar información en PostgreSQL y archivos en Storage, mientras que las migraciones SQL y las políticas RLS definen la estructura y seguridad del sistema
 
 <img src="diagram.png" width="800">
 
