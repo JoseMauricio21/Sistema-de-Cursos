@@ -52,7 +52,7 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 
 ### Base de datos y Backend con Supabase
 
-<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="120" alt="Supabase Logo">
+<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="200" alt="Supabase Logo">
 
 </div>
 
