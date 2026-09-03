@@ -146,3 +146,9 @@ Recursos visuales que presentan información de manera resumida y fácil de cons
 </p>
 
 </div>
+
+<div align="center">
+
+<img src="https://logos-marcas.com/wp-content/uploads/2021/08/Copyright-Emblema.png" width="50">
+
+</div>
