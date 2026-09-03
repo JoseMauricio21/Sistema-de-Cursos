@@ -16,6 +16,15 @@ Una plataforma web para el aprendizaje de inglés con sistema de autenticación 
 
 </div>
 
+<div align="center">
+
+![JavaScript](https://img.shields.io/badge/JavaScript-111111?style=flat-square&logo=javascript&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-111111?style=flat-square&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-111111?style=flat-square&logo=css3&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-111111?style=flat-square&logo=supabase&logoColor=white)
+
+</div>
+
 # Proyecto Eleah - Desarrollo de Software: Plataforma virtual
 
 Plataforma web desarrollada para ELEAH, enfocada en ofrecer cursos de inglés y diferentes recursos digitales para apoyar el aprendizaje de los estudiantes.
