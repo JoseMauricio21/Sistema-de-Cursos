@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/JoseMauricio21/Sistema-de-Cursos/refs/heads/main/Imagen2.png"" width="200">
+<a href="https://sistema-de-cursos.pages.dev/"><img src="https://raw.githubusercontent.com/JoseMauricio21/Sistema-de-Cursos/refs/heads/main/Imagen2.png"" width="200">
 
   # English Learning Platform
 
