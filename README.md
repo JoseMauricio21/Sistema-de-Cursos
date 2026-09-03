@@ -116,8 +116,7 @@ El proyecto fue desarrollado utilizando:
      alt="Open Source Logo">
 
 <p style="font-family: 'Times New Roman', Times, serif;">
-  Este proyecto es de código abierto y fue desarrollado con fines educativos.
-  Puedes consultar, modificar y contribuir al código.
+  𝘌𝘴𝘵𝘦 𝘱𝘳𝘰𝘺𝘦𝘤𝘵𝘰 𝘦𝘴 𝘥𝘦 𝘤𝘰𝘥𝘪𝘨𝘰 𝘢𝘣𝘪𝘦𝘳𝘵𝘰 𝘺 𝘧𝘶𝘦 𝘥𝘦𝘴𝘢𝘳𝘳𝘰𝘭𝘭𝘢𝘥𝘰 𝘤𝘰𝘯 𝘧𝘪𝘯𝘦𝘴 𝘦𝘥𝘶𝘤𝘢𝘵𝘪𝘷𝘰𝘴. 𝘗𝘶𝘦𝘥𝘦𝘴 𝘤𝘰𝘯𝘴𝘶𝘭𝘵𝘢𝘳, 𝘮𝘰𝘥𝘪𝘧𝘪𝘤𝘢𝘳 𝘺 𝘤𝘰𝘯𝘵𝘳𝘪𝘣𝘶𝘪𝘳 𝘢𝘭 𝘤𝘰𝘥𝘪𝘨𝘰.
 </p>
 
 </div>
