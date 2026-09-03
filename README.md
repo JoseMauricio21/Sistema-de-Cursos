@@ -7,7 +7,7 @@ Una plataforma web para el aprendizaje de inglés con sistema de autenticación 
 
 </div>
 
-# Página Web de ELEAH
+# Proyecto Eleah - Desarrollo de Software: Plataforma virtual
 
 Plataforma web desarrollada para ELEAH, enfocada en ofrecer cursos de inglés y diferentes recursos digitales para apoyar el aprendizaje de los estudiantes.
 
