@@ -73,27 +73,6 @@ El proyecto fue desarrollado utilizando:
 - CSS3
 - JavaScript
 
-## Estructura del proyecto
+## Open Source
 
-```text
-Sistema-de-Cursos/
-│
-├── assets/
-│   ├── images/
-│   ├── videos/
-│   └── icons/
-│
-├── css/
-│   └── styles.css
-│
-├── js/
-│   └── app.js
-│
-├── pages/
-│   ├── index.html
-│   ├── cursos.html
-│   ├── material.html
-│   ├── videos.html
-│   └── infografias.html
-│
-└── README.md
+Este proyecto es de código abierto y fue desarrollado con fines educativos. Puedes consultar, modificar y contribuir al código.
