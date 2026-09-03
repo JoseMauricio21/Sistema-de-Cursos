@@ -3,7 +3,7 @@
 
   # English Learning Platform
 
-Una plataforma web para el aprendizaje de inglés con sistema de autenticación completo.
+Una plataforma web para el aprendizaje de inglés.
 
 </div>
 
