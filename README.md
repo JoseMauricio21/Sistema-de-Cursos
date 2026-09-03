@@ -105,8 +105,6 @@ El proyecto fue desarrollado utilizando:
 - CSS3
 - JavaScript
 
-## Open Source
-
 <div align="center">
 
 <h2 style="font-family: 'Times New Roman', Times, serif;">
