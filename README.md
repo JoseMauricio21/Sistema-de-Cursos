@@ -99,11 +99,17 @@ Recursos visuales que presentan información de manera resumida y fácil de cons
 
 ## Lenguajes utilizados
 
+<!-- LANGUAGES:START -->
+
 <div align="center">
 
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=JoseMauricio21&repo=Sistema-de-Cursos&layout=donut&theme=default" alt="Lenguajes utilizados">
+| Lenguaje | Uso |
+|:---:|:---:|
+| Cargando... | ⏳ |
 
 </div>
+
+<!-- LANGUAGES:END -->
 
 <div align="center">
 
