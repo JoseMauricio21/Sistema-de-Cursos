@@ -47,6 +47,11 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 - Diseño adaptable a diferentes dispositivos
 
 ## Contenido de la plataforma
+<div align="center">
+### Base de datos en superbase
+<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="100">
+</div>
+<br><br>  
 
 La página cuenta con diferentes recursos destinados al aprendizaje del inglés, entre ellos:
 
