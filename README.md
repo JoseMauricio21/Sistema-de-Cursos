@@ -97,13 +97,13 @@ Material audiovisual utilizado para explicar temas y facilitar la comprensión d
 
 Recursos visuales que presentan información de manera resumida y fácil de consultar.
 
-## Tecnologías utilizadas
+## Lenguajes utilizados
 
-El proyecto fue desarrollado utilizando:
+<div align="center">
 
-- HTML5
-- CSS3
-- JavaScript
+<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=JoseMauricio21&repo=Sistema-de-Cursos&layout=compact&theme=default" alt="Lenguajes utilizados">
+
+</div>
 
 <div align="center">
 
