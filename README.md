@@ -101,7 +101,7 @@ Recursos visuales que presentan información de manera resumida y fácil de cons
 
 <div align="center">
 
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=JoseMauricio21&repo=Sistema-de-Cursos&layout=compact&theme=default" alt="Lenguajes utilizados">
+<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=JoseMauricio21&repo=Sistema-de-Cursos&layout=donut&theme=default" alt="Lenguajes utilizados">
 
 </div>
 
