@@ -47,6 +47,7 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 <br><br>  
 
 <div align="center">
+  
 ## Diagrama de Funciomamiento 
 <img src="diagram.png" width="500">
   </div>
