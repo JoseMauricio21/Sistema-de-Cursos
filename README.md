@@ -46,6 +46,12 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 </div>
 <br><br>  
 
+<div align="center">
+## Diagrama de Funciomamiento 
+<img src="diagram.png" width="300">
+  </div>
+<br><br>
+
 ## Características
 
 - Presentación de la plataforma ELEAH
