@@ -101,40 +101,12 @@ Recursos visuales que presentan información de manera resumida y fácil de cons
 
 <!-- LANGUAGES:START -->
 
-<h2 align="center">Lenguajes utilizados</h2>
-
-<!-- LANGUAGES:START -->
-
-<div align="center">
-
-<table>
-  <thead>
-    <tr>
-      <th>Lenguaje</th>
-      <th>Porcentaje</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>JavaScript</strong></td>
-      <td>41.23%</td>
-    </tr>
-    <tr>
-      <td><strong>PLpgSQL</strong></td>
-      <td>23.74%</td>
-    </tr>
-    <tr>
-      <td><strong>CSS</strong></td>
-      <td>20.93%</td>
-    </tr>
-    <tr>
-      <td><strong>HTML</strong></td>
-      <td>14.11%</td>
-    </tr>
-  </tbody>
-</table>
-
-</div>
+| Lenguaje | Porcentaje |
+|:--------:|:----------:|
+| **JavaScript** | 41.23% |
+| **PLpgSQL** | 23.74% |
+| **CSS** | 20.93% |
+| **HTML** | 14.11% |
 
 <!-- LANGUAGES:END -->
 
