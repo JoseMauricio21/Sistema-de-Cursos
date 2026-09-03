@@ -1,4 +1,4 @@
-name: Actualizar lenguajes del proyecto
+name: Actualizar lenguajes
 
 on:
   push:
@@ -10,25 +10,25 @@ permissions:
   contents: write
 
 jobs:
-  actualizar-lenguajes:
+  actualizar:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Obtener repositorio
+      - name: Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: Calcular lenguajes
+      - name: Obtener lenguajes de GitHub
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY: ${{ github.repository }}
         run: |
           python3 <<'PY'
           import json
           import os
           import urllib.request
 
-          repository = os.environ["REPOSITORY"]
-          url = f"https://api.github.com/repos/{repository}/languages"
+          repo = os.environ["GITHUB_REPOSITORY"]
+
+          url = f"https://api.github.com/repos/{repo}/languages"
 
           request = urllib.request.Request(
               url,
@@ -41,22 +41,16 @@ jobs:
           with urllib.request.urlopen(request) as response:
               languages = json.load(response)
 
-          if not languages:
-              print("No se encontraron lenguajes.")
-              exit(0)
-
           total = sum(languages.values())
-
-          languages = sorted(
-              languages.items(),
-              key=lambda item: item[1],
-              reverse=True
-          )
 
           rows = []
 
-          for language, value in languages:
-              percentage = (value / total) * 100
+          for language, amount in sorted(
+              languages.items(),
+              key=lambda x: x[1],
+              reverse=True
+          ):
+              percentage = (amount / total) * 100
               rows.append(
                   f"| **{language}** | {percentage:.2f}% |"
               )
@@ -69,40 +63,38 @@ jobs:
           with open("README.md", "r", encoding="utf-8") as file:
               readme = file.read()
 
-          start_index = readme.find(start)
-          end_index = readme.find(end)
+          start_position = readme.find(start)
+          end_position = readme.find(end)
 
-          if start_index == -1 or end_index == -1:
-              print("No se encontraron los marcadores en README.md")
-              exit(1)
+          if start_position == -1 or end_position == -1:
+              raise Exception(
+                  "No se encontraron los marcadores LANGUAGES en README.md"
+              )
 
-          end_index += len(end)
+          end_position += len(end)
 
-          new_section = f"""{start}
-
-          <div align="center">
+          new_content = f"""{start}
 
           | Lenguaje | Porcentaje |
-          |:---:|:---:|
+          |:--------:|:----------:|
           {table}
-
-          </div>
 
           {end}"""
 
           readme = (
-              readme[:start_index]
-              + new_section
-              + readme[end_index:]
+              readme[:start_position]
+              + new_content
+              + readme[end_position:]
           )
 
           with open("README.md", "w", encoding="utf-8") as file:
               file.write(readme)
 
-          print("Lenguajes actualizados correctamente.")
+          print("Lenguajes encontrados:")
+          print(json.dumps(languages, indent=2))
           PY
 
-      - name: Guardar cambios en README
+      - name: Actualizar README
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -110,8 +102,8 @@ jobs:
           git add README.md
 
           if git diff --cached --quiet; then
-            echo "No hay cambios."
+            echo "El README ya está actualizado."
           else
-            git commit -m "docs: actualizar lenguajes del proyecto"
+            git commit -m "docs: actualizar lenguajes"
             git push
           fi
