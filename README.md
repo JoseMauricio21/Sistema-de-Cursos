@@ -1,5 +1,5 @@
 <div align="center">
-
+<img src="https://raw.githubusercontent.com/JoseMauricio21/Sistema-de-Cursos/refs/heads/main/Imagen2.png"" width="100">
 # English Learning Platform
 
 Una plataforma web para el aprendizaje de inglés con sistema de autenticación completo.
