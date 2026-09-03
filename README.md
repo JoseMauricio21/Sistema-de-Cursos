@@ -6,6 +6,14 @@
 Una plataforma web para el aprendizaje de inglés con sistema de autenticación completo.
 
 </div>
+<div align="center">
+
+[![GitHub Stars](https://img.shields.io/github/stars/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=Stars)](https://github.com/JoseMauricio21/Sistema-de-Cursos/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=Forks)](https://github.com/JoseMauricio21/Sistema-de-Cursos/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=Issues)](https://github.com/JoseMauricio21/Sistema-de-Cursos/issues)
+[![GitHub License](https://img.shields.io/github/license/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=License)](https://github.com/JoseMauricio21/Sistema-de-Cursos/blob/main/LICENSE)
+
+</div>
 
 # Proyecto Eleah - Desarrollo de Software: Plataforma virtual
 
