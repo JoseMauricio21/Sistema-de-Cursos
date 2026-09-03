@@ -9,6 +9,7 @@ Una plataforma web para el aprendizaje de inglés.
 
 <div align="center">
 
+
 [![GitHub Stars](https://img.shields.io/github/stars/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=Stars)](https://github.com/JoseMauricio21/Sistema-de-Cursos/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=Forks)](https://github.com/JoseMauricio21/Sistema-de-Cursos/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/JoseMauricio21/Sistema-de-Cursos?style=flat-square&color=111111&label=Issues)](https://github.com/JoseMauricio21/Sistema-de-Cursos/issues)
