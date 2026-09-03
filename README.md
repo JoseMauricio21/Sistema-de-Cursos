@@ -42,7 +42,7 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 <img src="https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/assets/74038190/29fd6286-4e7b-4d6c-818f-c4765d5e39a9" width="100">
 <img src="https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/assets/74038190/67f477ed-6624-42da-99f0-1a7b1a16eecb" width="100">
 <img src="https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/assets/74038190/398b19b1-9aae-4c1f-8bc0-d172a2c08d68" width="100">
-<img src="https://s3-alpha.figma.com/hub/file/787485773/66821c0b-fb29-4ece-a775-195db0a7fc2e-cover.png" width="100">
+<img src="https://i.pinimg.com/736x/17/06/c9/1706c9f16bd08eb5e03f1df3e0a94a1c.jpg" width="100">
 </div>
 <br><br>  
 
