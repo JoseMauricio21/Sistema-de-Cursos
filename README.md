@@ -46,17 +46,39 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 - Interfaz sencilla y fácil de utilizar
 - Diseño adaptable a diferentes dispositivos
 
-<div align="center">
 ## Contenido de la plataforma
-<h3>Base de datos en Supabase</h3>
 
-<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="290">
+<div align="center">
 
-<p>
-  Gestión y almacenamiento de la información de la plataforma mediante Supabase.
-</p>
+### Base de datos y Backend con Supabase
+
+<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="120" alt="Supabase Logo">
 
 </div>
+
+Supabase funciona como un servicio de backend (**Backend-as-a-Service** o **BaaS**), que permite crear aplicaciones web y móviles sin tener que configurar servidores ni construir toda la infraestructura desde cero.
+
+Su núcleo principal está basado en **PostgreSQL**, una potente base de datos relacional que permite trabajar con tablas, relaciones, consultas SQL y diferentes funcionalidades para gestionar la información de una aplicación.
+
+En este proyecto, **Supabase se utiliza como backend y sistema de gestión de datos**, permitiendo conectar la plataforma web con la base de datos y administrar la información de los usuarios y cursos.
+
+### Componentes principales
+
+- **Base de datos PostgreSQL:** Permite almacenar y organizar la información de la plataforma mediante tablas y relaciones.
+
+- **Autenticación:** Permite gestionar el registro, inicio de sesión y acceso de los usuarios.
+
+- **APIs automáticas:** Facilita la comunicación entre la aplicación web y la base de datos.
+
+- **Almacenamiento:** Permite guardar y gestionar imágenes, videos, documentos y otros archivos utilizados en la plataforma.
+
+- **Edge Functions:** Permiten ejecutar código del lado del servidor sin necesidad de administrar servidores físicos.
+
+### ¿Por qué Supabase?
+
+Supabase facilita el desarrollo de la plataforma al proporcionar diferentes servicios de backend en un mismo lugar. Además, al estar basado en PostgreSQL, permite utilizar una estructura de datos relacional y realizar consultas mediante SQL.
+
+> Supabase es una herramienta de código abierto que proporciona servicios de backend para aplicaciones modernas utilizando PostgreSQL como base de datos principal.
 
 La página cuenta con diferentes recursos destinados al aprendizaje del inglés, entre ellos:
 
