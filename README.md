@@ -50,6 +50,8 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 <div align="center">
   
 ## Diagrama de Funciomamiento "Arquitectura de software"
+### Cómo una aplicación web estática desplegada en Cloudflare Pages utiliza HTML y JavaScript en el navegador para autenticarse mediante Supabase Auth, consumir datos mediante la API de Supabase, almacenar información en PostgreSQL y archivos en Storage, mientras que las migraciones SQL y las políticas RLS definen la estructura y seguridad del sistema
+
 <img src="diagram.png" width="800">
 
 El diagrama representa la arquitectura general del sistema de cursos, mostrando cómo se relacionan sus principales componentes. En la parte de Delivery se muestra el uso de Cloudflare Pages para alojar y desplegar la aplicación, mientras que en el frontend se encuentran las páginas HTML, los archivos JavaScript y los recursos visuales que permiten al usuario interactuar con el sistema. Estos componentes se conectan con Supabase, que se encarga de la autenticación de usuarios, el acceso a la API, la base de datos PostgreSQL y el almacenamiento de archivos, como los avatares. Finalmente, la sección de datos y autorización muestra los archivos SQL utilizados para crear y modificar la estructura de la base de datos, así como las políticas de seguridad RLS que controlan el acceso a la información. En conjunto, el diagrama permite visualizar de manera clara cómo funciona y se organiza el sistema, desde que el usuario entra a la aplicación hasta que se consultan o modifican los datos.
