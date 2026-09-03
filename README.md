@@ -130,7 +130,7 @@ Recursos visuales que presentan información de manera resumida y fácil de cons
   Open Source
 </h2>
 
-<img src="https://www.muylinux.com/wp-content/uploads/2010/05/opensource-logo.png" 
+<a href="https://opensource.com/"><img src="https://www.muylinux.com/wp-content/uploads/2010/05/opensource-logo.png" 
      width="180" 
      alt="Open Source Logo">
 
