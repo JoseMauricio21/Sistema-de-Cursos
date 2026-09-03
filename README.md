@@ -50,10 +50,9 @@ El sitio reúne material didáctico, videos, infografías y actividades relacion
 
 <div align="center">
 
+<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="300" alt="Supabase Logo">
+
 ### Base de datos y Backend con Supabase
-
-<img src="https://awsmp-logos.s3.amazonaws.com/seller-tvv3ohr7rtbr4/67f3074a2f8e72fee097c7345d4ba60d.png" width="200" alt="Supabase Logo">
-
 </div>
 
 Supabase funciona como un servicio de backend (**Backend-as-a-Service** o **BaaS**), que permite crear aplicaciones web y móviles sin tener que configurar servidores ni construir toda la infraestructura desde cero.
